@@ -6,6 +6,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* 로컬 페이지 여는 과정에서 오류가 생겨서 이 부분 코드 추가 했습니다 */
+@layer utilities {
+  .border-border {
+    border-color: #e5e7eb;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
