@@ -14,6 +14,11 @@ datasource db {
   url      = env("POSTGRES_URL")
 }
 
+enum UserRole {
+  customer
+  admin
+}
+
 model Users {
   user_id      Int            @id @default(autoincrement())
   name         String
@@ -23,7 +28,7 @@ model Users {
   address      String?
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
-  role         String
+  role         UserRole       @default(customer)
   Carts        Carts[]
   Reviews      Reviews[]
   Orders       Orders[]
