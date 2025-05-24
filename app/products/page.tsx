@@ -1,43 +1,60 @@
-import Link from "next/link"
-import Image from "next/image"
-import { Search, Filter } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-import ProductCard from "@/components/product-card"
-import { allProducts } from "@/lib/products"
+import Link from "next/link";
+import Image from "next/image";
+import { Search, Filter } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import ProductCard from "@/components/product-card";
+import { allProducts } from "@/lib/products";
+import SiteFooter from "@/components/site-footer";
+import TopNav from "@/components/top-nav";
+import MainNav from "@/components/main-nav";
+import SiteLogo from "@/components/site-logo";
 
 export default function ProductsPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex-1 flex justify-start">
-            <Link href="/" className="text-2xl font-bold text-purple-800">
-              마켓컬리
-            </Link>
-          </div>
-          <div className="flex-1 relative max-w-md mx-auto">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="검색어를 입력해주세요"
-                className="w-full py-2 pl-4 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-              <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+      <header className="sticky top-0 z-50 bg-white border-b">
+        <div className="container mx-auto px-4">
+          <TopNav />
+          <div className="flex items-center py-4">
+            <SiteLogo />
+            <nav className="hidden md:flex flex-1 items-center">
+              <MainNav />
+            </nav>
+            <div className="flex-1 relative max-w-md mx-auto">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="검색어를 입력해주세요"
+                  className="w-full py-2 pl-4 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <Search className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+              </div>
             </div>
-          </div>
-          <div className="flex-1 flex justify-end items-center gap-4">
-            <Link href="/signup" className="text-sm text-gray-600 hover:text-purple-800">
-              회원가입
-            </Link>
-            <Link href="/login" className="text-sm text-gray-600 hover:text-purple-800">
-              로그인
-            </Link>
-            <Link href="/cart" className="relative">
-              <Image src="/placeholder.svg?height=24&width=24" alt="Cart" width={24} height={24} />
-              <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                3
-              </span>
-            </Link>
+            <div className="flex-1 flex justify-end items-center gap-4">
+              <Link
+                href="/signup"
+                className="text-sm text-gray-600 hover:text-purple-800"
+              >
+                회원가입
+              </Link>
+              <Link
+                href="/login"
+                className="text-sm text-gray-600 hover:text-purple-800"
+              >
+                로그인
+              </Link>
+              <Link href="/cart" className="relative">
+                <Image
+                  src="/placeholder.svg?height=24&width=24"
+                  alt="Cart"
+                  width={24}
+                  height={24}
+                />
+                <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  3
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -45,7 +62,10 @@ export default function ProductsPage() {
       <nav className="border-b">
         <div className="container mx-auto px-4">
           <div className="flex justify-center space-x-8">
-            <Link href="/products?category=new" className="py-4 px-2 text-purple-800 border-b-2 border-purple-800">
+            <Link
+              href="/products?category=new"
+              className="py-4 px-2 text-purple-800 border-b-2 border-purple-800"
+            >
               신상품
             </Link>
             <Link
@@ -168,29 +188,7 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      <footer className="bg-gray-100 py-12 mt-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="mb-6 md:mb-0">
-              <h3 className="text-lg font-bold mb-4">고객센터</h3>
-              <p className="text-2xl font-bold mb-2">1644-1107</p>
-              <p className="text-gray-600 text-sm">365일 오전 7시 - 오후 7시</p>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold mb-4">마켓컬리</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>회사소개</li>
-                <li>채용정보</li>
-                <li>이용약관</li>
-                <li>개인정보처리방침</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-300 text-sm text-gray-500">
-            © 2024 Market Kurly. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
-  )
+  );
 }

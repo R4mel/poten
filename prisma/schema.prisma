@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+enum UserRole {
+  customer
+  admin
+}
+
+model Users {
+  user_id     Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  password    String   // 소셜 로그인도 항상 값이 들어감 (난수+bcrypt)
+  phone       String? // 마이페이지에서 추가 정보 입력
+  address     String? // 마이페이지에서 추가 정보 입력
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  role        UserRole  @default(customer)
+  provider    String?   // 소셜 로그인 구분 (google, kakao 등)
+  provider_id String?   // 소셜 고유 id
+  Carts       Carts[]
+  Reviews     Reviews[]
+  Orders      Orders[]
+  Wishlists   Wishlists[]
+  User_Coupons User_Coupons[]
+}
+
+model Products {
+  product_id      Int         @id @default(autoincrement())
+  name            String
+  description     String?
+  price           Decimal
+  stock           Int
+  category_id     Int
+  created_at      DateTime    @default(now())
+  products_option String?     @map("products option")
+  Category        Categories  @relation(fields: [category_id], references: [category_id])
+  Cart_Items      Cart_Items[]
+  Reviews         Reviews[]
+  Wishlists       Wishlists[]
+}
+
+model Cart_Items {
+  cart_item_id Int      @id @default(autoincrement())
+  cart_id      Int
+  product_id   Int
+  quantity     Int
+  Cart         Carts    @relation(fields: [cart_id], references: [cart_id])
+  Product      Products @relation(fields: [product_id], references: [product_id])
+}
+
+model Carts {
+  cart_id Int    @id @default(autoincrement())
+  user_id Int
+  User    Users  @relation(fields: [user_id], references: [user_id])
+  Cart_Items Cart_Items[]
+}
+
+model Categories {
+  category_id Int         @id @default(autoincrement())
+  name        String
+  parent_id   Int?
+  Parent      Categories? @relation("CategoryParent", fields: [parent_id], references: [category_id])
+  Children    Categories[] @relation("CategoryParent")
+  Products    Products[]
+}
+
+model Payments {
+  payment_id Int      @id @default(autoincrement())
+  order_id   Int     @unique
+  method     String
+  amount     Decimal
+  paid_at    DateTime?
+  Order      Orders   @relation(fields: [order_id], references: [order_id])
+}
+
+model Orders {
+  order_id     Int       @id @default(autoincrement())
+  user_id      Int
+  status       String
+  total_price  Decimal
+  created_at   DateTime  @default(now())
+  payment_state String?  @map("payment state")
+  User         Users     @relation(fields: [user_id], references: [user_id])
+  Payment      Payments?
+  Reviews      Reviews[]
+}
+
+model Reviews {
+  review_id   Int      @id @default(autoincrement())
+  user_id     Int
+  product_id  Int
+  order_id    Int?
+  rating      Int
+  comment     String?
+  created_at  DateTime @default(now())
+  User        Users    @relation(fields: [user_id], references: [user_id])
+  Product     Products @relation(fields: [product_id], references: [product_id])
+  Order       Orders?  @relation(fields: [order_id], references: [order_id])
+}
+
+model Wishlists {
+  wishlist_id Int      @id @default(autoincrement())
+  user_id     Int
+  product_id  Int
+  created_at  DateTime @default(now())
+  User        Users    @relation(fields: [user_id], references: [user_id])
+  Product     Products @relation(fields: [product_id], references: [product_id])
+}
+
+model Coupons {
+  coupon_id   Int      @id @default(autoincrement())
+  code        String   @unique
+  discount    Decimal
+  type        String
+  valid_from  DateTime
+  valid_to    DateTime
+  usage_limit Int
+  User_Coupons User_Coupons[]
+}
+
+model User_Coupons {
+  user_coupon_id Int      @id @default(autoincrement())
+  user_id        Int
+  coupon_id      Int
+  used_at        DateTime?
+  User           Users    @relation(fields: [user_id], references: [user_id])
+  Coupon         Coupons  @relation(fields: [coupon_id], references: [coupon_id])
+}
