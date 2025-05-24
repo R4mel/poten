@@ -6,22 +6,36 @@ import { Button } from "@/components/ui/button";
 import TopNav from "@/components/top-nav";
 import MainNav from "@/components/main-nav";
 import SiteLogo from "@/components/site-logo";
+import { useRouter } from "next/navigation";
 
 export default function FindPasswordPage() {
   const [email, setEmail] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setResult(null);
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setResult(
-        "If this email is registered, a password reset link has been sent to your email."
-      );
+    try {
+      const res = await fetch("/api/users/find-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok && data.userId) {
+        // Redirect to reset-password page with uid
+        router.push(`/reset-password?uid=${data.userId}`);
+      } else {
+        setResult(data.error || "일치하는 회원 정보가 없습니다.");
+      }
+    } catch {
+      setResult("서버 오류가 발생했습니다.");
+    } finally {
       setLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -48,7 +62,7 @@ export default function FindPasswordPage() {
             required
           />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "확인 중..." : "비밀번호 찾기"}
+            {loading ? "조회 중..." : "비밀번호 찾기"}
           </Button>
         </form>
         {result && (

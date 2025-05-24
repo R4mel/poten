@@ -29,44 +29,16 @@ export default async function handler(
 
     // Find ID
     if (findType === "id") {
-      if (!email || !name) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-      const { data: user, error } = await supabase
-        .from("Users")
-        .select("user_id, email, name")
-        .eq("email", email)
-        .eq("name", name)
-        .single();
-      if (error || !user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      return res.status(200).json({ user_id: user.user_id });
+      return res
+        .status(501)
+        .json({ error: "이메일로 아이디 전송 기능이 비활성화되었습니다." });
     }
 
     // Find Password
     if (findType === "password") {
-      if (!email || !name) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-      const { data: user, error } = await supabase
-        .from("Users")
-        .select("user_id, email, name, provider")
-        .eq("email", email)
-        .eq("name", name)
-        .single();
-      if (error || !user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-      if (user.provider === "google") {
-        return res.status(400).json({
-          error:
-            "소셜 로그인(구글) 계정은 비밀번호 재설정이 불가합니다. 로그인 화면에서 해당 소셜 버튼을 이용해 주세요.",
-        });
-      }
       return res
-        .status(200)
-        .json({ message: "Password reset link sent (mock)" });
+        .status(501)
+        .json({ error: "이메일로 비밀번호 전송 기능이 비활성화되었습니다." });
     }
 
     // User Registration
