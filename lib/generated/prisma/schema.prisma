@@ -24,11 +24,13 @@ model Users {
   name         String
   email        String         @unique
   password     String
-  phone        String
-  address      String?
+  phone        String? // nullable
+  address      String? // nullable
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
-  role         UserRole       @default(customer)
+  role         UserRole?      @default(customer) // nullable (optional, but default to customer)
+  provider     String? // nullable
+  provider_id  String? // nullable
   Carts        Carts[]
   Reviews      Reviews[]
   Orders       Orders[]

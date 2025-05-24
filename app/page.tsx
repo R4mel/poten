@@ -1,7 +1,11 @@
-import Link from "next/link"
-import { Menu, Search, ShoppingCart, User } from "lucide-react"
-import ProductCard from "@/components/product-card"
-import { products } from "@/lib/products"
+import Link from "next/link";
+import { Menu, Search, ShoppingCart, User } from "lucide-react";
+import ProductCard from "@/components/product-card";
+import { products } from "@/lib/products";
+import SiteFooter from "@/components/site-footer";
+import TopNav from "@/components/top-nav";
+import MainNav from "@/components/main-nav";
+import SiteLogo from "@/components/site-logo";
 
 export default function Home() {
   return (
@@ -9,71 +13,16 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white border-b">
         <div className="container mx-auto px-4">
           {/* Top navigation */}
-          <div className="flex justify-end py-2 text-sm space-x-4">
-            <Link href="/signup" className="text-gray-600 hover:text-purple-800">
-              회원가입
-            </Link>
-            <span className="text-gray-300">|</span>
-            <Link href="/login" className="text-gray-600 hover:text-purple-800">
-              로그인
-            </Link>
-            <span className="text-gray-300">|</span>
-            <Link href="/customer-service" className="text-gray-600 hover:text-purple-800">
-              고객센터
-            </Link>
-          </div>
-
+          <TopNav />
           {/* Main navigation */}
           <div className="flex items-center py-4">
-            <Link href="/" className="mr-8">
-              <h1 className="text-2xl font-bold text-purple-800">마켓컬리</h1>
-            </Link>
+            <SiteLogo />
 
             <nav className="hidden md:flex flex-1 items-center">
-              <ul className="flex space-x-8">
-                <li>
-                  <Link href="/categories" className="flex items-center text-gray-900 hover:text-purple-800">
-                    <Menu className="mr-1 h-5 w-5" />
-                    카테고리
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/new-products" className="text-gray-900 hover:text-purple-800">
-                    신상품
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/best-products" className="text-gray-900 hover:text-purple-800">
-                    베스트
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/sale-products" className="text-gray-900 hover:text-purple-800">
-                    알뜰쇼핑
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="https://www.kurly.com/collections/market-time-sales"
-                    target="_blank"
-                    className="text-gray-900 hover:text-purple-800"
-                  >
-                    특가/혜택
-                  </Link>
-                </li>
-              </ul>
+              <MainNav />
             </nav>
 
             <div className="flex items-center ml-auto space-x-4">
-              <div className="hidden md:block">
-                <Link
-                  href="/delivery-info"
-                  className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800"
-                >
-                  <span className="text-purple-800">샛별·하루</span> 배송안내
-                </Link>
-              </div>
-
               <div className="relative hidden md:block">
                 <input
                   type="text"
@@ -111,29 +60,7 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="bg-gray-100 py-12 mt-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="mb-6 md:mb-0">
-              <h3 className="text-lg font-bold mb-4">고객센터</h3>
-              <p className="text-2xl font-bold mb-2">1644-1107</p>
-              <p className="text-gray-600 text-sm">365일 오전 7시 - 오후 7시</p>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold mb-4">마켓컬리</h3>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li>회사소개</li>
-                <li>채용정보</li>
-                <li>이용약관</li>
-                <li>개인정보처리방침</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-300 text-sm text-gray-500">
-            © 2024 Market Kurly. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
-  )
+  );
 }

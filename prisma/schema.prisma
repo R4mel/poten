@@ -23,12 +23,14 @@ model Users {
   user_id     Int       @id @default(autoincrement())
   name        String
   email       String    @unique
-  password    String
-  phone       String
-  address     String?
+  password    String   // 소셜 로그인도 항상 값이 들어감 (난수+bcrypt)
+  phone       String? // 마이페이지에서 추가 정보 입력
+  address     String? // 마이페이지에서 추가 정보 입력
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
   role        UserRole  @default(customer)
+  provider    String?   // 소셜 로그인 구분 (google, kakao 등)
+  provider_id String?   // 소셜 고유 id
   Carts       Carts[]
   Reviews     Reviews[]
   Orders      Orders[]
