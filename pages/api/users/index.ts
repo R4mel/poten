@@ -6,6 +6,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  //유저 목록 조희
   if (req.method === "GET") {
     const { data, error } = await supabase
       .from("Users")
