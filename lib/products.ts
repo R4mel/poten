@@ -18,7 +18,7 @@ export const products: Product[] = [
     name: "[집밥의완성] 된장찌개",
     price: 6900,
     image:
-      "https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/c1ebe507-40f3-4f17-b44a-f64b2da03d2d.jpg",
+      "https://img-cf.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/shop/data/goods/1647407885598l0.jpg",
     category: "국/탕/찌개",
     description:
       "구수한 된장과 신선한 채소가 어우러진 전통 된장찌개입니다. 풍부한 맛과 영양을 간편하게 즐겨보세요.",
@@ -52,7 +52,7 @@ export const products: Product[] = [
     originalPrice: 10900,
     discount: 18,
     image:
-      "https://img-cf.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/shop/data/goods/1653037345236l0.jpeg",
+      "https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/568c9a24-18ca-40c4-b9e0-950f59a025b9.jpg",
     category: "반찬",
     description:
       "신선한 오징어와 매콤한 양념이 어우러진 밥도둑 반찬입니다. 아이들도 좋아하는 맛으로 온 가족이 즐길 수 있습니다.",
@@ -76,7 +76,7 @@ export const products: Product[] = [
     originalPrice: 12900,
     discount: 23,
     image:
-      "https://search.pstatic.net/common/?src=http%3A%2F%2Fblogfiles.naver.net%2FMjAyNTA1MDdfNTAg%2FMDAxNzQ2NTczMjU5NDI4.Cjn0h5HC-Tdm3TPd5ICJ40M6U0zNQLQMmPdYzNPuwJwg.qmBYsQ3cHACffvUWojs_UcPoPDbS8Fy6WZ6fVF_uGVMg.JPEG%2F900%25A3%25DF20250430%25A3%25DF232207.jpg&type=sc960_832",
+      "https://image.greating.co.kr/IL/item/202307/10/DCCA3CA39EE84953BE0198B9D0792B43.png",
     category: "메인요리",
     description:
       "매콤달콤한 양념에 볶아낸 부드러운 돼지고기와 야채가 어우러진 제육볶음입니다. 밥 한 공기와 함께 즐겨보세요.",
