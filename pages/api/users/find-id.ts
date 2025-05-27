@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { supabase } from "@/lib/supabase";
+import { sendEmail } from "@/lib/email";
 
 export default async function handler(
   req: NextApiRequest,
@@ -21,5 +22,15 @@ export default async function handler(
   if (error || !user) {
     return res.status(404).json({ error: "일치하는 회원 정보가 없습니다." });
   }
-  return res.status(200).json({ email: user.email });
+  // Send the user's ID (email) to their email address
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "[Poten] 아이디 찾기 결과",
+      text: `회원님의 아이디(이메일)는: ${user.email}`,
+    });
+    return res.status(200).json({ success: true });
+  } catch (e) {
+    return res.status(500).json({ error: "이메일 전송에 실패했습니다." });
+  }
 }

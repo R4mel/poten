@@ -10,14 +10,22 @@ export default async function handler(
 
   // GET: Get product detail
   if (req.method === "GET") {
-    const { data, error } = await supabase
+    // Fetch product
+    const { data: product, error } = await supabase
       .from("Products")
       .select("*")
       .eq("product_id", id)
       .single();
-    if (error)
+    if (error || !product)
       return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
-    return res.status(200).json(data);
+    // Fetch images for this product
+    const { data: images } = await supabase
+      .from("Image")
+      .select("url, alt")
+      .eq("product_id", id);
+    // Attach images array to product
+    product.images = images || [];
+    return res.status(200).json(product);
   }
 
   // PUT: Update product (admin only)

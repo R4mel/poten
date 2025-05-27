@@ -8,6 +8,7 @@ import SiteFooter from "@/components/site-footer";
 import TopNav from "@/components/top-nav";
 import MainNav from "@/components/main-nav";
 import SiteLogo from "@/components/site-logo";
+import CartIconWithCount from "@/components/cart-icon-with-count";
 
 export default function ProductsPage() {
   return (
@@ -43,16 +44,8 @@ export default function ProductsPage() {
               >
                 로그인
               </Link>
-              <Link href="/cart" className="relative">
-                <Image
-                  src="/placeholder.svg?height=24&width=24"
-                  alt="Cart"
-                  width={24}
-                  height={24}
-                />
-                <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  3
-                </span>
+              <Link href="/cart" className="relative text-gray-700">
+                <CartIconWithCount />
               </Link>
             </div>
           </div>

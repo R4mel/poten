@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Menu, Search, ShoppingCart, User } from "lucide-react";
+import { Menu, Search, User } from "lucide-react";
 import ProductCard from "@/components/product-card";
 import { products } from "@/lib/products";
 import SiteFooter from "@/components/site-footer";
 import TopNav from "@/components/top-nav";
 import MainNav from "@/components/main-nav";
 import SiteLogo from "@/components/site-logo";
+import CartIconWithCount from "@/components/cart-icon-with-count";
 
 export default function Home() {
   return (
@@ -37,10 +38,7 @@ export default function Home() {
               </Link>
 
               <Link href="/cart" className="relative text-gray-700">
-                <ShoppingCart className="h-6 w-6" />
-                <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  0
-                </span>
+                <CartIconWithCount />
               </Link>
             </div>
 

@@ -23,14 +23,14 @@ model Users {
   user_id      Int            @id @default(autoincrement())
   name         String
   email        String         @unique
-  password     String
-  phone        String? // nullable
-  address      String? // nullable
+  password     String // 소셜 로그인도 항상 값이 들어감 (난수+bcrypt)
+  phone        String? // 마이페이지에서 추가 정보 입력
+  address      String? // 마이페이지에서 추가 정보 입력
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
-  role         UserRole?      @default(customer) // nullable (optional, but default to customer)
-  provider     String? // nullable
-  provider_id  String? // nullable
+  role         UserRole       @default(customer)
+  provider     String? // 소셜 로그인 구분 (google, kakao 등)
+  provider_id  String? // 소셜 고유 id
   Carts        Carts[]
   Reviews      Reviews[]
   Orders       Orders[]
@@ -51,6 +51,7 @@ model Products {
   Cart_Items      Cart_Items[]
   Reviews         Reviews[]
   Wishlists       Wishlists[]
+  images          Image[]
 }
 
 model Cart_Items {
@@ -60,6 +61,8 @@ model Cart_Items {
   quantity     Int
   Cart         Carts    @relation(fields: [cart_id], references: [cart_id])
   Product      Products @relation(fields: [product_id], references: [product_id])
+
+  @@unique([cart_id, product_id])
 }
 
 model Carts {
@@ -139,4 +142,12 @@ model User_Coupons {
   used_at        DateTime?
   User           Users     @relation(fields: [user_id], references: [user_id])
   Coupon         Coupons   @relation(fields: [coupon_id], references: [coupon_id])
+}
+
+model Image {
+  image_id   Int      @id @default(autoincrement())
+  url        String
+  alt        String?
+  product_id Int
+  Product    Products @relation(fields: [product_id], references: [product_id])
 }
