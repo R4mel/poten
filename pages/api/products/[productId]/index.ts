@@ -4,22 +4,22 @@ import { checkAdmin } from "@/lib/checkAdmin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   
-  const { id } = req.query;
+  const { productId } = req.query;
 
-  if (!id || Array.isArray(id) || isNaN(Number(id))) {
+  if (!productId || Array.isArray(productId) || isNaN(Number(productId))) {
     return res.status(400).json({ message: '잘못된 ID' });
   }
-  // 권한 체크 (예: PUT, DELETE 등)
-  if (["PUT", "DELETE"].includes(req.method!)) {
-    const isAdmin = await checkAdmin(req, res);
-    if (!isAdmin) return;
-  }
+  // // 권한 체크 (예: PUT, DELETE 등)
+  // if (["PUT", "DELETE"].includes(req.method!)) {
+  //   const isAdmin = await checkAdmin(req, res);
+  //   if (!isAdmin) return;
+  // }
   // 상품 상세 조회  
   if (req.method === 'GET') {
     const { data: product, error } = await supabase
       .from('Products')
       .select('*')
-      .eq('product_id', Number(id))
+      .eq('product_id', Number(productId))
       .single();
 
     if (error || !product) {
@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: updatedProduct, error } = await supabase
       .from('Products')
       .update({ name, description, price, stock })
-      .eq('product_id', Number(id))
+      .eq('product_id', Number(productId))
       .single();
 
     if (error) {
@@ -52,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { error } = await supabase
       .from('Products')
       .delete()
-      .eq('product_id', Number(id));
+      .eq('product_id', Number(productId));
 
     if (error) {
       return res.status(500).json({ message: '상품 삭제 실패', error: error.message });

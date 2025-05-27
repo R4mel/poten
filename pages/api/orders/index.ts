@@ -4,10 +4,10 @@ import { checkAdmin } from "@/lib/checkAdmin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // //권한 체크
-  if (["GET"].includes(req.method!)) {
-    const isAdmin = await checkAdmin(req, res);
-    if (!isAdmin) return;
-  }
+  // if (["GET"].includes(req.method!)) {
+  //   const isAdmin = await checkAdmin(req, res);
+  //   if (!isAdmin) return;
+  // }
   
     // 전체 주문 목록 조회 //관리자
   if (req.method === 'GET') {

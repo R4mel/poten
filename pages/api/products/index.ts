@@ -4,11 +4,11 @@ import { checkAdmin } from "@/lib/checkAdmin";
 import { ca } from 'date-fns/locale';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // //권한 체크
-  if (["POST"].includes(req.method!)) {
-    const isAdmin = await checkAdmin(req, res);
-    if (!isAdmin) return;
-  }
+  // // //권한 체크
+  // if (["POST"].includes(req.method!)) {
+  //   const isAdmin = await checkAdmin(req, res);
+  //   if (!isAdmin) return;
+  // }
   
   // 상품 목록 조회
   if (req.method === 'GET') {

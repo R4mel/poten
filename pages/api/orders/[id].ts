@@ -9,10 +9,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: '잘못된 ID' });
   }
   // 권한 체크
-  if (["PUT"].includes(req.method!)) {
-    const isAdmin = await checkAdmin(req, res);
-    if (!isAdmin) return;
-  }
+  // if (["PUT"].includes(req.method!)) {
+  //   const isAdmin = await checkAdmin(req, res);
+  //   if (!isAdmin) return;
+  // }
 
   // 주문 상세 조회
   if (req.method === 'GET') {
