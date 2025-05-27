@@ -41,7 +41,7 @@ export default function ProductsPage() {
                 href="/login"
                 className="text-sm text-gray-600 hover:text-purple-800"
               >
-                로그인
+                하이
               </Link>
               <Link href="/cart" className="relative">
                 <Image

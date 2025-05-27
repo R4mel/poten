@@ -206,7 +206,7 @@ const TopRankedProductsSection = () => {
                             aria-label="수량 증가"
                           >+</button>
                         </div>
-                      </div>
+                      </div> 
                       <div className="flex gap-3 mt-4">
                         <button
                           className="flex-1 py-2 rounded border border-gray-300 text-gray-700 bg-white font-medium hover:bg-gray-50"
