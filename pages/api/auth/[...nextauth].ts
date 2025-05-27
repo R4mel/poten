@@ -95,6 +95,10 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
+    async redirect({ url, baseUrl }) {
+      // 구글 로그인 등 모든 로그인 성공 시 홈으로 리다이렉트
+      return baseUrl;
+    },
     async jwt({ token, user }) {
       // Persist role in JWT
       if (user && (user as any).role) {
