@@ -29,6 +29,10 @@ export default function SignupForm() {
   const [nameInput, setNameInput] = useState("");
   const [isComposing, setIsComposing] = useState(false); // Track IME composition
   const [showMap, setShowMap] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [inputCode, setInputCode] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -163,6 +167,58 @@ export default function SignupForm() {
     }).open();
   };
 
+  // Email verification handler
+  const handleSendVerification = async () => {
+    if (!form.email.includes("@")) {
+      setErrors((prev) => ({
+        ...prev,
+        email: "이메일 형식이 올바르지 않습니다.",
+      }));
+      return;
+    }
+    setLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/users/verify-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setVerificationSent(true);
+        setVerificationCode(data.code); // In production, do not expose code
+        setMessage("인증 코드가 이메일로 전송되었습니다.");
+      } else {
+        setMessage(data.error || "이메일 인증 코드 전송 실패");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 인증코드 확인 (서버 검증)
+  const handleVerifyCode = async () => {
+    setLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/users/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email, code: inputCode }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setEmailVerified(true);
+        setMessage("이메일 인증이 완료되었습니다.");
+      } else {
+        setMessage(data.error || "인증 코드가 올바르지 않습니다.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <form
@@ -183,8 +239,34 @@ export default function SignupForm() {
             onChange={handleChange}
             required
             className="flex-1"
+            disabled={emailVerified}
           />
+          <Button
+            type="button"
+            onClick={handleSendVerification}
+            disabled={loading || emailVerified}
+            className="ml-2"
+          >
+            {verificationSent ? "재전송" : "인증코드 전송"}
+          </Button>
         </div>
+        {verificationSent && !emailVerified && (
+          <div className="flex items-center gap-2 mt-2">
+            <Input
+              type="text"
+              placeholder="인증 코드 입력"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value)}
+              className="flex-1"
+            />
+            <Button type="button" onClick={handleVerifyCode}>
+              인증 확인
+            </Button>
+          </div>
+        )}
+        {emailVerified && (
+          <div className="text-green-600 text-xs ml-28">이메일 인증 완료</div>
+        )}
         {errors.email && (
           <div className="text-red-500 text-xs ml-28">{errors.email}</div>
         )}

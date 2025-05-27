@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
 import { supabase } from "@/lib/supabase";
+import { sendEmail } from "@/lib/email";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,9 +30,29 @@ export default async function handler(
 
     // Find ID
     if (findType === "id") {
-      return res
-        .status(501)
-        .json({ error: "이메일로 아이디 전송 기능이 비활성화되었습니다." });
+      // Send ID to email using nodemailer
+      if (!email) {
+        return res.status(400).json({ error: "이메일을 입력해 주세요." });
+      }
+      // Find user by email
+      const { data: user, error } = await supabase
+        .from("Users")
+        .select("email")
+        .eq("email", email)
+        .single();
+      if (error || !user) {
+        return res.status(404).json({ error: "일치하는 회원 정보가 없습니다." });
+      }
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "[Poten] 아이디 찾기 결과",
+          text: `회원님의 아이디(이메일)는: ${user.email}`,
+        });
+        return res.status(200).json({ success: true });
+      } catch (e) {
+        return res.status(500).json({ error: "이메일 전송에 실패했습니다." });
+      }
     }
 
     // Find Password

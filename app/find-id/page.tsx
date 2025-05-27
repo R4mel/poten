@@ -23,8 +23,8 @@ export default function FindIdPage() {
         body: JSON.stringify({ name }),
       });
       const data = await res.json();
-      if (res.ok && data.email) {
-        setResult(`회원님의 이메일은: ${data.email}`);
+      if (res.ok && data.success) {
+        setResult("이메일이 성공적으로 전송되었습니다. 확인해 주세요.");
       } else {
         setResult(data.error || "일치하는 회원 정보가 없습니다.");
       }
