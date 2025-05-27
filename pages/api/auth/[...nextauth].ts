@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
         const { data: user, error } = await supabase
           .from("Users")
           .select(
-            "user_id, email, password, name, created_at, provider, provider_id"
+            "user_id, email, password, name, phone, address, role, created_at, provider, provider_id"
           )
           .eq("email", credentials.email)
           .single();
@@ -38,6 +38,9 @@ export const authOptions: NextAuthOptions = {
           id: user.user_id,
           email: user.email,
           name: user.name,
+          phone: user.phone,
+          address: user.address,
+          role: user.role,
         };
       },
     }),
@@ -92,9 +95,19 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
+    async jwt({ token, user }) {
+      // Persist role in JWT
+      if (user && (user as any).role) {
+        token.role = (user as any).role;
+      }
+      return token;
+    },
     async session({ session, token }) {
       if (session.user && token?.sub) {
         (session.user as any).id = token.sub;
+      }
+      if (session.user && token?.role) {
+        (session.user as any).role = token.role;
       }
       return session;
     },
