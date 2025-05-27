@@ -32,15 +32,6 @@ export default function CartPage() {
             </nav>
 
             <div className="flex items-center ml-auto space-x-4">
-              <div className="hidden md:block">
-                <Link
-                  href="/delivery-info"
-                  className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800"
-                >
-                  <span className="text-purple-800">샛별·하루</span> 배송안내
-                </Link>
-              </div>
-
               <Link href="/cart" className="relative text-gray-700">
                 <ShoppingCart className="h-6 w-6" />
                 <span className="absolute -top-2 -right-2 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -90,7 +81,14 @@ export default function CartPage() {
                       />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
+                      <h3 className="font-medium">
+                        <Link
+                          href={`/products/${item.id}`}
+                          className="hover:underline text-purple-800"
+                        >
+                          {item.name}
+                        </Link>
+                      </h3>
                       <div className="flex items-center mt-2 gap-2">
                         <button
                           onClick={() =>

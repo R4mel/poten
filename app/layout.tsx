@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/lib/use-cart";
 import { Toaster } from "@/components/ui/toaster";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import AuthContext from "@/components/auth-context"; //
+import AuthContext from "@/components/auth-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
