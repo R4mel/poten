@@ -3,11 +3,11 @@ import { supabase } from '@/lib/supabase';
 import { checkAdmin } from "@/lib/checkAdmin";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { productId, id } = req.query;
+  const { productId, reviewId } = req.query;
 
   if (
     !productId || Array.isArray(productId) || isNaN(Number(productId)) ||
-    !id || Array.isArray(id) || isNaN(Number(id))
+    !reviewId || Array.isArray(reviewId) || isNaN(Number(reviewId))
   ) {
     return res.status(400).json({ message: '잘못된 요청' });
   }
@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: review, error: reviewError } = await supabase
       .from('Reviews')
       .select('user_id')
-      .eq('review_id', Number(id))
+      .eq('review_id', Number(reviewId))
       .eq('product_id', Number(productId))
       .single();
 
@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: updatedReview, error } = await supabase
       .from('Reviews')
       .update({ rating, comment })
-      .eq('review_id', Number(id))
+      .eq('review_id', Number(reviewId))
       .eq('product_id', Number(productId))
       .select() 
       .single();
@@ -61,14 +61,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: review, error: reviewError } = await supabase
       .from('Reviews')
       .select('user_id')
-      .eq('review_id', Number(id))
+      .eq('review_id', Number(reviewId))
       .eq('product_id', Number(productId))
       .single();
 
     if (reviewError || !review) {
       return res.status(404).json({ message: '리뷰를 찾을 수 없습니다.', error: reviewError?.message });
     }
-
+    //권한 체크
     // let isAdmin =  true;
     // try {
     //   isAdmin = await checkAdmin(req, res);
@@ -83,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { error } = await supabase
       .from('Reviews')
       .delete()
-      .eq('review_id', Number(id))
+      .eq('review_id', Number(reviewId))
       .eq('product_id', Number(productId));
 
     if (error) {
