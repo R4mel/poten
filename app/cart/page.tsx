@@ -9,9 +9,19 @@ import SiteFooter from "@/components/site-footer";
 import TopNav from "@/components/top-nav";
 import MainNav from "@/components/main-nav";
 import SiteLogo from "@/components/site-logo";
+import { loadTossPaymentsWidget } from "@/lib/toss-widget";
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+
+declare global {
+  interface Window {
+    TossPayments?: any;
+  }
+}
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { data: session } = useSession();
 
   const totalPrice = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -19,6 +29,61 @@ export default function CartPage() {
   );
   const shippingFee = totalPrice > 40000 ? 0 : 3000;
   const finalPrice = totalPrice + shippingFee;
+
+  useEffect(() => {
+    loadTossPaymentsWidget(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!);
+  }, []);
+
+  // 결제하기 버튼 클릭 핸들러
+  const handleTossPayment = async () => {
+    if (typeof window === "undefined" || !window.TossPayments) {
+      alert("토스 결제 위젯을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+    if (!session?.user) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+    const userId = Number((session.user as any).id); // Ensure userId is a number
+    // Patch: use correct API field names
+    const payload = {
+      userId,
+      amount: finalPrice,
+      currency: "KRW",
+      email: session.user.email,
+      name: session.user.name,
+      items: items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+    };
+    const res = await fetch("/api/payments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "결제 준비 중 오류가 발생했습니다.");
+      return;
+    }
+    if (typeof window.TossPayments !== "function") {
+      alert("토스 결제 위젯을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.");
+      return;
+    }
+    const toss = window.TossPayments(process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY!);
+    toss.requestPayment("카드", {
+      amount: finalPrice,
+      orderId: `order-${data.orderId}`,
+      orderName: items.map((item) => item.name).join(", "),
+      customerEmail: session.user.email,
+      customerName: session.user.name,
+      successUrl: `${window.location.origin}/payment/success`,
+      failUrl: `${window.location.origin}/payment/fail`,
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -152,7 +217,10 @@ export default function CartPage() {
                     </span>
                   </div>
                 </div>
-                <Button className="w-full mt-6 bg-purple-800 hover:bg-purple-900">
+                <Button
+                  className="w-full mt-6 bg-purple-800 hover:bg-purple-900"
+                  onClick={handleTossPayment}
+                >
                   결제하기
                 </Button>
               </div>
