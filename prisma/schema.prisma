@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider      = "prisma-client-js"
   output        = "../lib/generated/prisma"
@@ -15,30 +9,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-//prisma test
-
-enum UserRole {
-  customer
-  admin
-}
-
 model Users {
   user_id      Int            @id @default(autoincrement())
   name         String
   email        String         @unique
-  password     String // 소셜 로그인도 항상 값이 들어감 (난수+bcrypt)
-  phone        String? // 마이페이지에서 추가 정보 입력
-  address      String? // 마이페이지에서 추가 정보 입력
+  password     String
+  phone        String?
+  address      String?
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt
   role         UserRole       @default(customer)
-  provider     String? // 소셜 로그인 구분 (google, kakao 등)
-  provider_id  String? // 소셜 고유 id
+  provider     String?
+  provider_id  String?
   Carts        Carts[]
-  Reviews      Reviews[]
   Orders       Orders[]
-  Wishlists    Wishlists[]
+  Reviews      Reviews[]
   User_Coupons User_Coupons[]
+  Wishlists    Wishlists[]
 }
 
 model Products {
@@ -50,11 +37,11 @@ model Products {
   category_id     Int
   created_at      DateTime     @default(now())
   products_option String?      @map("products option")
-  Category        Categories   @relation(fields: [category_id], references: [category_id])
   Cart_Items      Cart_Items[]
+  images          Image[]
+  Category        Categories   @relation(fields: [category_id], references: [category_id])
   Reviews         Reviews[]
   Wishlists       Wishlists[]
-  images          Image[]
 }
 
 model Cart_Items {
@@ -71,8 +58,8 @@ model Cart_Items {
 model Carts {
   cart_id    Int          @id @default(autoincrement())
   user_id    Int
-  User       Users        @relation(fields: [user_id], references: [user_id])
   Cart_Items Cart_Items[]
+  User       Users        @relation(fields: [user_id], references: [user_id])
 }
 
 model Categories {
@@ -113,9 +100,9 @@ model Reviews {
   rating     Int
   comment    String?
   created_at DateTime @default(now())
-  User       Users    @relation(fields: [user_id], references: [user_id])
-  Product    Products @relation(fields: [product_id], references: [product_id])
   Order      Orders?  @relation(fields: [order_id], references: [order_id])
+  Product    Products @relation(fields: [product_id], references: [product_id])
+  User       Users    @relation(fields: [user_id], references: [user_id])
 }
 
 model Wishlists {
@@ -123,8 +110,8 @@ model Wishlists {
   user_id     Int
   product_id  Int
   created_at  DateTime @default(now())
-  User        Users    @relation(fields: [user_id], references: [user_id])
   Product     Products @relation(fields: [product_id], references: [product_id])
+  User        Users    @relation(fields: [user_id], references: [user_id])
 }
 
 model Coupons {
@@ -143,8 +130,8 @@ model User_Coupons {
   user_id        Int
   coupon_id      Int
   used_at        DateTime?
-  User           Users     @relation(fields: [user_id], references: [user_id])
   Coupon         Coupons   @relation(fields: [coupon_id], references: [coupon_id])
+  User           Users     @relation(fields: [user_id], references: [user_id])
 }
 
 model Image {
@@ -153,4 +140,9 @@ model Image {
   alt        String?
   product_id Int
   Product    Products @relation(fields: [product_id], references: [product_id])
+}
+
+enum UserRole {
+  customer
+  admin
 }
