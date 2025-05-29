@@ -33,8 +33,18 @@ export default function TopNav() {
     );
   }
 
+  // Show user role (left of 마이페이지 | 로그아웃 | 고객센터)
+  const userRole = (session.user as any)?.role;
+  let roleLabel = null;
+  if (userRole === "admin") roleLabel = "관리자";
+  else if (userRole === "customer") roleLabel = "일반회원";
+  else if (userRole) roleLabel = userRole;
+
   return (
-    <div className="flex justify-end py-2 text-sm space-x-4">
+    <div className="flex justify-end py-2 text-sm space-x-4 items-center">
+      {roleLabel && (
+        <span className="text-purple-700 font-semibold mr-2">{roleLabel}</span>
+      )}
       <Link href="/mypage" className="text-gray-600 hover:text-purple-800">
         마이페이지
       </Link>

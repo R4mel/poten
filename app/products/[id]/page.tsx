@@ -48,7 +48,7 @@ export default function ProductPage({
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.images?.[0]?.url || "",
+      image: product.imageUrl || "",
       quantity,
     });
 
@@ -96,8 +96,8 @@ export default function ProductPage({
           <div className="md:w-1/2">
             <div className="rounded-lg overflow-hidden">
               <Image
-                src={product.images?.[0]?.url || "/placeholder.svg"}
-                alt={product.images?.[0]?.alt || product.name}
+                src={product.imageUrl || "/placeholder.svg"}
+                alt={product.name}
                 width={600}
                 height={600}
                 className="w-full object-cover"

@@ -4,8 +4,9 @@ export interface Product {
   price: number
   originalPrice?: number
   discount?: number
-  images: { url: string; alt?: string }[]
-  category: string
+  imageUrl?: string // Added for DB-backed products
+  images?: { url: string; alt?: string }[]
+  category?: string
   description?: string
 }
 
