@@ -10,22 +10,19 @@ datasource db {
 }
 
 model Users {
-  user_id      Int            @id @default(autoincrement())
-  name         String
-  email        String         @unique
-  password     String
-  phone        String?
-  address      String?
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt
-  role         UserRole       @default(customer)
-  provider     String?
-  provider_id  String?
-  Carts        Carts[]
-  Orders       Orders[]
-  Reviews      Reviews[]
-  User_Coupons User_Coupons[]
-  Wishlists    Wishlists[]
+  user_id     Int      @id @default(autoincrement())
+  name        String
+  email       String   @unique
+  password    String
+  phone       String?
+  address     String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  role        UserRole @default(customer)
+  provider    String?
+  provider_id String?
+  Carts       Carts[]
+  Orders      Orders[]
 }
 
 model Products {
@@ -37,11 +34,9 @@ model Products {
   category_id     Int
   created_at      DateTime     @default(now())
   products_option String?      @map("products option")
+  imageUrl        String?
   Cart_Items      Cart_Items[]
-  images          Image[]
   Category        Categories   @relation(fields: [category_id], references: [category_id])
-  Reviews         Reviews[]
-  Wishlists       Wishlists[]
 }
 
 model Cart_Items {
@@ -89,57 +84,14 @@ model Orders {
   payment_state String?   @map("payment state")
   User          Users     @relation(fields: [user_id], references: [user_id])
   Payment       Payments?
-  Reviews       Reviews[]
 }
 
-model Reviews {
-  review_id  Int      @id @default(autoincrement())
-  user_id    Int
-  product_id Int
-  order_id   Int?
-  rating     Int
-  comment    String?
+model CustomerService {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  author     String
   created_at DateTime @default(now())
-  Order      Orders?  @relation(fields: [order_id], references: [order_id])
-  Product    Products @relation(fields: [product_id], references: [product_id])
-  User       Users    @relation(fields: [user_id], references: [user_id])
-}
-
-model Wishlists {
-  wishlist_id Int      @id @default(autoincrement())
-  user_id     Int
-  product_id  Int
-  created_at  DateTime @default(now())
-  Product     Products @relation(fields: [product_id], references: [product_id])
-  User        Users    @relation(fields: [user_id], references: [user_id])
-}
-
-model Coupons {
-  coupon_id    Int            @id @default(autoincrement())
-  code         String         @unique
-  discount     Decimal
-  type         String
-  valid_from   DateTime
-  valid_to     DateTime
-  usage_limit  Int
-  User_Coupons User_Coupons[]
-}
-
-model User_Coupons {
-  user_coupon_id Int       @id @default(autoincrement())
-  user_id        Int
-  coupon_id      Int
-  used_at        DateTime?
-  Coupon         Coupons   @relation(fields: [coupon_id], references: [coupon_id])
-  User           Users     @relation(fields: [user_id], references: [user_id])
-}
-
-model Image {
-  image_id   Int      @id @default(autoincrement())
-  url        String
-  alt        String?
-  product_id Int
-  Product    Products @relation(fields: [product_id], references: [product_id])
 }
 
 enum UserRole {

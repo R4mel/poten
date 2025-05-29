@@ -291,6 +291,24 @@ export default function MyPage() {
     }
   };
 
+  // --- Order List for User ---
+  const [orders, setOrders] = useState<any[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  useEffect(() => {
+    if (!user?.user_id) return;
+    setLoadingOrders(true);
+    fetch(`/api/orders?userId=${user.user_id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setOrders(Array.isArray(data) ? data : []);
+        setLoadingOrders(false);
+      })
+      .catch(() => {
+        setOrders([]);
+        setLoadingOrders(false);
+      });
+  }, [user?.user_id]);
+
   if (status === "loading") {
     return <div className="py-16 text-center">Loading...</div>;
   }
@@ -300,73 +318,422 @@ export default function MyPage() {
     return null;
   }
 
+  // Sidebar navigation items
+  const navItems = [
+    { key: "orders", label: "주문내역", icon: "📦" },
+    { key: "profile", label: "회원정보", icon: "👤" },
+    { key: "password", label: "비밀번호 변경", icon: "🔒" },
+  ];
+  const [section, setSection] = useState("orders");
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12">
-      <Card className="w-full max-w-md mx-auto">
-        <CardHeader className="flex flex-col items-center gap-2">
-          <Avatar className="h-20 w-20">
-            <AvatarImage
-              src={user?.image || undefined}
-              alt={user?.name || "User"}
-            />
-            <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
-          </Avatar>
-          <CardTitle className="text-xl mt-2">
-            {user?.name || "사용자"}
-          </CardTitle>
-          <div className="text-gray-500 text-sm">{user?.email}</div>
-          <div className="text-gray-500 text-sm">
-            권한: {user?.role || "customer"}
+    <div className="min-h-screen bg-[#f9fafb] flex flex-col items-center py-10">
+      <div className="w-full max-w-5xl flex gap-8">
+        {/* Sidebar */}
+        <aside className="w-56 shrink-0">
+          <div className="bg-white rounded-2xl shadow p-6 mb-6">
+            <div className="flex flex-col items-center">
+              <Avatar className="h-20 w-20 mb-2 border-4 border-purple-100 shadow">
+                <AvatarImage
+                  src={user?.image || undefined}
+                  alt={user?.name || "User"}
+                />
+                <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+              </Avatar>
+              <div className="font-bold text-lg mt-2">
+                {user?.name || "사용자"}
+              </div>
+              <div className="text-gray-500 text-sm mb-1">{user?.email}</div>
+              <span className="inline-block bg-purple-50 text-purple-700 text-xs rounded px-2 py-0.5 mt-1">
+                {user?.role === "admin" ? "관리자" : "일반회원"}
+              </span>
+            </div>
           </div>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4 mt-4">
-          {isAdmin && (
-            <div className="mb-4 p-4 border rounded bg-gray-100">
-              <div className="font-bold mb-2">[관리자] 상품 관리 (CRUD)</div>
-              <div className="mb-2 flex justify-between items-center">
-                <span>총 {products.length}개</span>
-                <Dialog open={showAdd} onOpenChange={setShowAdd}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="secondary">
-                      + 상품 추가
+          <nav className="bg-white rounded-2xl shadow p-4 flex flex-col gap-2">
+            {navItems.map((item) => (
+              <button
+                key={item.key}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-left transition font-medium text-gray-700 hover:bg-purple-50 ${
+                  section === item.key ? "bg-purple-100 text-purple-800" : ""
+                }`}
+                onClick={() => setSection(item.key)}
+              >
+                <span className="text-lg">{item.icon}</span>
+                {item.label}
+              </button>
+            ))}
+          </nav>
+        </aside>
+        {/* Main Content */}
+        <main className="flex-1 min-w-0">
+          {/* 주문내역 */}
+          {section === "orders" && (
+            <section className="bg-white rounded-2xl shadow p-8 mb-8">
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <span className="text-2xl">📦</span> 주문 내역
+              </h2>
+              {loadingOrders ? (
+                <div className="py-8 text-center text-gray-500">로딩 중...</div>
+              ) : orders.length === 0 ? (
+                <div className="py-8 text-center text-gray-500">
+                  주문 내역이 없습니다.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm border rounded-xl overflow-hidden">
+                    <thead>
+                      <tr className="bg-purple-50 text-purple-800">
+                        <th className="p-3 border">주문번호</th>
+                        <th className="p-3 border">주문일시</th>
+                        <th className="p-3 border">상태</th>
+                        <th className="p-3 border">결제수단</th>
+                        <th className="p-3 border">총금액</th>
+                        <th className="p-3 border">상세</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders.map((order) => (
+                        <tr key={order.order_id} className="even:bg-gray-50">
+                          <td className="p-3 border font-mono">
+                            {order.order_id}
+                          </td>
+                          <td className="p-3 border">
+                            {new Date(order.created_at).toLocaleString()}
+                          </td>
+                          <td className="p-3 border">{order.status}</td>
+                          <td className="p-3 border">
+                            {order.payment_method || "-"}
+                          </td>
+                          <td className="p-3 border">
+                            {order.total_price?.toLocaleString()}원
+                          </td>
+                          <td className="p-3 border">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                router.push(
+                                  `/payment/success?orderId=order-${order.order_id}`
+                                )
+                              }
+                            >
+                              상세
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
+          {/* 회원정보 */}
+          {section === "profile" && (
+            <section className="bg-white rounded-2xl shadow p-8 mb-8">
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <span className="text-2xl">👤</span> 회원정보
+              </h2>
+              <form
+                onSubmit={handleUpdate}
+                className="flex flex-col gap-6 max-w-lg"
+              >
+                <div>
+                  <div className="font-semibold mb-1">이메일</div>
+                  <div className="text-gray-700 bg-gray-50 rounded px-3 py-2">
+                    {user?.email}
+                  </div>
+                </div>
+                <div>
+                  <div className="font-semibold mb-1">전화번호</div>
+                  <Input
+                    type="text"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="전화번호를 입력하세요"
+                  />
+                </div>
+                <div>
+                  <div className="font-semibold mb-1">주소</div>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="text"
+                      value={address}
+                      readOnly
+                      placeholder="주소를 입력하세요"
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleAddressSearch}
+                      className="ml-2 whitespace-nowrap"
+                    >
+                      주소 검색
                     </Button>
-                  </DialogTrigger>
+                  </div>
+                  <div
+                    id="map"
+                    ref={mapRef}
+                    style={{
+                      width: 300,
+                      height: 300,
+                      marginTop: 10,
+                      display: showMap ? "block" : "none",
+                    }}
+                  ></div>
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "수정 중..." : "정보 수정"}
+                </Button>
+                {result && (
+                  <div className="text-center text-sm text-gray-700">
+                    {result}
+                  </div>
+                )}
+              </form>
+            </section>
+          )}
+          {/* 비밀번호 변경 */}
+          {section === "password" && (
+            <section className="bg-white rounded-2xl shadow p-8 mb-8 max-w-lg">
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <span className="text-2xl">🔒</span> 비밀번호 변경
+              </h2>
+              <form onSubmit={handleUpdate} className="flex flex-col gap-6">
+                <div>
+                  <div className="font-semibold mb-1">
+                    새 비밀번호 (6자 이상)
+                  </div>
+                  <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="새 비밀번호"
+                  />
+                </div>
+                <div>
+                  <div className="font-semibold mb-1">새 비밀번호 확인</div>
+                  <Input
+                    type="password"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    placeholder="새 비밀번호 확인"
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "수정 중..." : "비밀번호 변경"}
+                </Button>
+                {result && (
+                  <div className="text-center text-sm text-gray-700">
+                    {result}
+                  </div>
+                )}
+              </form>
+            </section>
+          )}
+          {/* 관리자 상품 관리 (기존 코드, 관리자만) */}
+          {isAdmin && (
+            <section className="bg-white rounded-2xl shadow p-8 mb-8">
+              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <span className="text-2xl">🛒</span> [관리자] 상품 관리 (CRUD)
+              </h2>
+              <div className="mb-4 p-4 border rounded bg-gray-100">
+                <div className="font-bold mb-2">[관리자] 상품 관리 (CRUD)</div>
+                <div className="mb-2 flex justify-between items-center">
+                  <span>총 {products.length}개</span>
+                  <Dialog open={showAdd} onOpenChange={setShowAdd}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="secondary">
+                        + 상품 추가
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>상품 추가</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleAddProduct} className="space-y-2">
+                        <Label>상품명</Label>
+                        <Input
+                          value={addForm.name}
+                          onChange={(e) =>
+                            setAddForm((f) => ({ ...f, name: e.target.value }))
+                          }
+                          required
+                        />
+                        <Label>가격</Label>
+                        <Input
+                          type="number"
+                          value={addForm.price}
+                          onChange={(e) =>
+                            setAddForm((f) => ({ ...f, price: e.target.value }))
+                          }
+                          required
+                        />
+                        <Label>재고</Label>
+                        <Input
+                          type="number"
+                          value={addForm.stock}
+                          onChange={(e) =>
+                            setAddForm((f) => ({ ...f, stock: e.target.value }))
+                          }
+                          required
+                        />
+                        <Label>카테고리ID</Label>
+                        <Input
+                          value={addForm.category_id}
+                          onChange={(e) =>
+                            setAddForm((f) => ({
+                              ...f,
+                              category_id: e.target.value,
+                            }))
+                          }
+                          required
+                        />
+                        <Label>이미지 URL</Label>
+                        <Input
+                          value={addForm.image}
+                          onChange={(e) =>
+                            setAddForm((f) => ({ ...f, image: e.target.value }))
+                          }
+                        />
+                        <Label>설명</Label>
+                        <Input
+                          value={addForm.description}
+                          onChange={(e) =>
+                            setAddForm((f) => ({
+                              ...f,
+                              description: e.target.value,
+                            }))
+                          }
+                        />
+                        <Label>옵션</Label>
+                        <Input
+                          value={addForm.products_option}
+                          onChange={(e) =>
+                            setAddForm((f) => ({
+                              ...f,
+                              products_option: e.target.value,
+                            }))
+                          }
+                        />
+                        <DialogFooter>
+                          <Button type="submit">추가</Button>
+                          <DialogClose asChild>
+                            <Button type="button" variant="secondary">
+                              취소
+                            </Button>
+                          </DialogClose>
+                        </DialogFooter>
+                        {crudError && (
+                          <div className="text-red-600 text-sm mt-2">
+                            {crudError}
+                          </div>
+                        )}
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+                {loadingProducts ? (
+                  <div className="py-4 text-center text-gray-500">
+                    로딩 중...
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm border">
+                      <thead>
+                        <tr className="bg-gray-200">
+                          <th className="p-2 border">ID</th>
+                          <th className="p-2 border">이미지</th>
+                          <th className="p-2 border">상품명</th>
+                          <th className="p-2 border">가격</th>
+                          <th className="p-2 border">재고</th>
+                          <th className="p-2 border">카테고리</th>
+                          <th className="p-2 border">관리</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {products.map((p) => (
+                          <tr key={p.product_id}>
+                            <td className="p-2 border">{p.product_id}</td>
+                            <td className="p-2 border">
+                              {p.image && (
+                                <Image
+                                  src={p.image}
+                                  alt={p.name}
+                                  width={40}
+                                  height={40}
+                                  className="rounded"
+                                />
+                              )}
+                            </td>
+                            <td className="p-2 border">{p.name}</td>
+                            <td className="p-2 border">
+                              {p.price?.toLocaleString()}원
+                            </td>
+                            <td className="p-2 border">{p.stock}</td>
+                            <td className="p-2 border">{p.category_id}</td>
+                            <td className="p-2 border">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => openEdit(p)}
+                                className="mr-2"
+                              >
+                                수정
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() =>
+                                  handleDeleteProduct(p.product_id)
+                                }
+                              >
+                                삭제
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {/* Edit Dialog */}
+                <Dialog open={showEdit} onOpenChange={setShowEdit}>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>상품 추가</DialogTitle>
+                      <DialogTitle>상품 수정</DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleAddProduct} className="space-y-2">
+                    <form onSubmit={handleEditProduct} className="space-y-2">
                       <Label>상품명</Label>
                       <Input
-                        value={addForm.name}
+                        value={editForm.name}
                         onChange={(e) =>
-                          setAddForm((f) => ({ ...f, name: e.target.value }))
+                          setEditForm((f) => ({ ...f, name: e.target.value }))
                         }
                         required
                       />
                       <Label>가격</Label>
                       <Input
                         type="number"
-                        value={addForm.price}
+                        value={editForm.price}
                         onChange={(e) =>
-                          setAddForm((f) => ({ ...f, price: e.target.value }))
+                          setEditForm((f) => ({ ...f, price: e.target.value }))
                         }
                         required
                       />
                       <Label>재고</Label>
                       <Input
                         type="number"
-                        value={addForm.stock}
+                        value={editForm.stock}
                         onChange={(e) =>
-                          setAddForm((f) => ({ ...f, stock: e.target.value }))
+                          setEditForm((f) => ({ ...f, stock: e.target.value }))
                         }
                         required
                       />
                       <Label>카테고리ID</Label>
                       <Input
-                        value={addForm.category_id}
+                        value={editForm.category_id}
                         onChange={(e) =>
-                          setAddForm((f) => ({
+                          setEditForm((f) => ({
                             ...f,
                             category_id: e.target.value,
                           }))
@@ -375,16 +742,16 @@ export default function MyPage() {
                       />
                       <Label>이미지 URL</Label>
                       <Input
-                        value={addForm.image}
+                        value={editForm.image}
                         onChange={(e) =>
-                          setAddForm((f) => ({ ...f, image: e.target.value }))
+                          setEditForm((f) => ({ ...f, image: e.target.value }))
                         }
                       />
                       <Label>설명</Label>
                       <Input
-                        value={addForm.description}
+                        value={editForm.description}
                         onChange={(e) =>
-                          setAddForm((f) => ({
+                          setEditForm((f) => ({
                             ...f,
                             description: e.target.value,
                           }))
@@ -392,16 +759,16 @@ export default function MyPage() {
                       />
                       <Label>옵션</Label>
                       <Input
-                        value={addForm.products_option}
+                        value={editForm.products_option}
                         onChange={(e) =>
-                          setAddForm((f) => ({
+                          setEditForm((f) => ({
                             ...f,
                             products_option: e.target.value,
                           }))
                         }
                       />
                       <DialogFooter>
-                        <Button type="submit">추가</Button>
+                        <Button type="submit">저장</Button>
                         <DialogClose asChild>
                           <Button type="button" variant="secondary">
                             취소
@@ -416,225 +783,14 @@ export default function MyPage() {
                     </form>
                   </DialogContent>
                 </Dialog>
+                {crudError && (
+                  <div className="text-red-600 text-sm mt-2">{crudError}</div>
+                )}
               </div>
-              {loadingProducts ? (
-                <div className="py-4 text-center text-gray-500">로딩 중...</div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm border">
-                    <thead>
-                      <tr className="bg-gray-200">
-                        <th className="p-2 border">ID</th>
-                        <th className="p-2 border">이미지</th>
-                        <th className="p-2 border">상품명</th>
-                        <th className="p-2 border">가격</th>
-                        <th className="p-2 border">재고</th>
-                        <th className="p-2 border">카테고리</th>
-                        <th className="p-2 border">관리</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((p) => (
-                        <tr key={p.product_id}>
-                          <td className="p-2 border">{p.product_id}</td>
-                          <td className="p-2 border">
-                            {p.image && (
-                              <Image
-                                src={p.image}
-                                alt={p.name}
-                                width={40}
-                                height={40}
-                                className="rounded"
-                              />
-                            )}
-                          </td>
-                          <td className="p-2 border">{p.name}</td>
-                          <td className="p-2 border">
-                            {p.price?.toLocaleString()}원
-                          </td>
-                          <td className="p-2 border">{p.stock}</td>
-                          <td className="p-2 border">{p.category_id}</td>
-                          <td className="p-2 border">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => openEdit(p)}
-                              className="mr-2"
-                            >
-                              수정
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleDeleteProduct(p.product_id)}
-                            >
-                              삭제
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              {/* Edit Dialog */}
-              <Dialog open={showEdit} onOpenChange={setShowEdit}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>상품 수정</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleEditProduct} className="space-y-2">
-                    <Label>상품명</Label>
-                    <Input
-                      value={editForm.name}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, name: e.target.value }))
-                      }
-                      required
-                    />
-                    <Label>가격</Label>
-                    <Input
-                      type="number"
-                      value={editForm.price}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, price: e.target.value }))
-                      }
-                      required
-                    />
-                    <Label>재고</Label>
-                    <Input
-                      type="number"
-                      value={editForm.stock}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, stock: e.target.value }))
-                      }
-                      required
-                    />
-                    <Label>카테고리ID</Label>
-                    <Input
-                      value={editForm.category_id}
-                      onChange={(e) =>
-                        setEditForm((f) => ({
-                          ...f,
-                          category_id: e.target.value,
-                        }))
-                      }
-                      required
-                    />
-                    <Label>이미지 URL</Label>
-                    <Input
-                      value={editForm.image}
-                      onChange={(e) =>
-                        setEditForm((f) => ({ ...f, image: e.target.value }))
-                      }
-                    />
-                    <Label>설명</Label>
-                    <Input
-                      value={editForm.description}
-                      onChange={(e) =>
-                        setEditForm((f) => ({
-                          ...f,
-                          description: e.target.value,
-                        }))
-                      }
-                    />
-                    <Label>옵션</Label>
-                    <Input
-                      value={editForm.products_option}
-                      onChange={(e) =>
-                        setEditForm((f) => ({
-                          ...f,
-                          products_option: e.target.value,
-                        }))
-                      }
-                    />
-                    <DialogFooter>
-                      <Button type="submit">저장</Button>
-                      <DialogClose asChild>
-                        <Button type="button" variant="secondary">
-                          취소
-                        </Button>
-                      </DialogClose>
-                    </DialogFooter>
-                    {crudError && (
-                      <div className="text-red-600 text-sm mt-2">
-                        {crudError}
-                      </div>
-                    )}
-                  </form>
-                </DialogContent>
-              </Dialog>
-              {crudError && (
-                <div className="text-red-600 text-sm mt-2">{crudError}</div>
-              )}
-            </div>
+            </section>
           )}
-          <form onSubmit={handleUpdate} className="flex flex-col gap-4">
-            <div>
-              <div className="font-semibold">이메일</div>
-              <div className="text-gray-700">{user?.email}</div>
-            </div>
-            <div>
-              <div className="font-semibold">전화번호</div>
-              <Input
-                type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="전화번호를 입력하세요"
-              />
-            </div>
-            <div>
-              <div className="font-semibold">주소</div>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="text"
-                  value={address}
-                  readOnly
-                  placeholder="주소를 입력하세요"
-                />
-                <Button
-                  type="button"
-                  onClick={handleAddressSearch}
-                  className="ml-2 whitespace-nowrap"
-                >
-                  주소 검색
-                </Button>
-              </div>
-              <div
-                id="map"
-                ref={mapRef}
-                style={{
-                  width: 300,
-                  height: 300,
-                  marginTop: 10,
-                  display: showMap ? "block" : "none",
-                }}
-              ></div>
-            </div>
-            <div>
-              <div className="font-semibold">비밀번호 변경</div>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="새 비밀번호 (6자 이상)"
-              />
-              <Input
-                type="password"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                placeholder="새 비밀번호 확인"
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "수정 중..." : "정보 수정"}
-            </Button>
-            {result && (
-              <div className="text-center text-sm text-gray-700">{result}</div>
-            )}
-          </form>
-        </CardContent>
-      </Card>
+        </main>
+      </div>
     </div>
   );
 }
