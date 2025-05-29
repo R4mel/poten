@@ -24,8 +24,8 @@ export async function tossTestPayment({
     orderName,
     customerEmail,
     customerName,
-    successUrl: "https://localhost:3000/payment/success",
-    failUrl: "https://localhost:3000/payment/fail",
+    successUrl: ["https://localhost:3000/payment/success", "https://poten.vercel.app/success"],
+    failUrl: ["https://localhost:3000/payment/fail", "https://poten.vercel.app/fail"],
     // Add more fields as needed for test
   };
   const response = await axios.post(TOSS_API_URL, payload, {
