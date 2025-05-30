@@ -4,6 +4,7 @@ import type React from "react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -19,10 +20,18 @@ import MainNav from "@/components/main-nav";
 import SiteLogo from "@/components/site-logo";
 
 export default function LoginPage() {
+  const { data: session, status } = useSession();
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  // If already logged in, redirect to home
+  if (status === "loading") return null;
+  if (session) {
+    if (typeof window !== "undefined") router.replace("/");
+    return null;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });

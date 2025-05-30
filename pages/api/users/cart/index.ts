@@ -68,13 +68,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       cart = newCart;
     }
     // Upsert cart item
-    const { error: upsertError } = await supabase
+    const intProductId = Number(product_id);
+    const intQuantity = Number(quantity);
+    const { error: upsertError, data: upsertData } = await supabase
       .from("Cart_Items")
-      .upsert({ cart_id: cart.cart_id, product_id, quantity }, { onConflict: "cart_id,product_id" });
+      .upsert({ cart_id: cart.cart_id, product_id: intProductId, quantity: intQuantity }, { onConflict: "cart_id,product_id" });
     if (upsertError) {
-      return res.status(500).json({ error: "장바구니 추가 실패" });
+      console.error("Cart_Items upsert error:", upsertError);
+      return res.status(500).json({ error: "장바구니 추가 실패", details: upsertError.message });
     }
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, upsertData });
   }
 
   return res.status(405).json({ error: "허용되지 않은 메서드" });

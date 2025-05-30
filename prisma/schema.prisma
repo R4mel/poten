@@ -26,17 +26,15 @@ model Users {
 }
 
 model Products {
-  product_id      Int          @id @default(autoincrement())
-  name            String
-  description     String?
-  price           Decimal
-  stock           Int
-  category_id     Int
-  created_at      DateTime     @default(now())
-  products_option String?      @map("products option")
-  imageUrl        String?
-  Cart_Items      Cart_Items[]
-  Category        Categories   @relation(fields: [category_id], references: [category_id])
+  product_id  Int          @id @default(autoincrement())
+  name        String
+  description String? // Remain for product detail page
+  price       Decimal
+  category_id Int
+  created_at  DateTime     @default(now())
+  imageUrl    String?
+  Cart_Items  Cart_Items[]
+  Category    Categories   @relation(fields: [category_id], references: [category_id])
 }
 
 model Cart_Items {

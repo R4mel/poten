@@ -1,18 +1,22 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import CategoryDropdown from "./category-dropdown";
 
-export default function MainNav() {
+export default function MainNav({
+  onCategorySelect,
+}: {
+  onCategorySelect?: (categoryId: number, categoryName: string) => void;
+}) {
+  const handleCategorySelect = (categoryId: number, categoryName: string) => {
+    if (onCategorySelect) {
+      onCategorySelect(categoryId, categoryName);
+    }
+  };
   return (
     <nav className="hidden md:flex flex-1 items-center">
       <ul className="flex space-x-8">
         <li>
-          <Link
-            href="/categories"
-            className="flex items-center text-gray-900 hover:text-purple-800"
-          >
-            <Menu className="mr-1 h-5 w-5" />
-            카테고리
-          </Link>
+          <CategoryDropdown onCategorySelect={handleCategorySelect} />
         </li>
         <li>
           <Link

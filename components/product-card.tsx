@@ -1,18 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/lib/types";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   return (
-    <Link href={`/products/${product.id}`} className="group">
+    <div
+      className="group cursor-pointer"
+      onClick={() => router.push(`/products/${product.id}`)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") router.push(`/products/${product.id}`);
+      }}
+    >
       <div className="relative overflow-hidden rounded-lg">
         <Image
           src={product.imageUrl || "/placeholder.svg"}
@@ -51,6 +60,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
