@@ -19,6 +19,7 @@ type Product = {
   createdAt?: string;
   sales?: number;
   category?: string;
+  shippingText?: string;
 };
 
 const mockCategories = [

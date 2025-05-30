@@ -7,9 +7,29 @@ export const products: Product[] = [
     price: 7900,
     originalPrice: 9900,
     discount: 20,
+    couponRate: 10,
+    shippingLabel: "새벽배송",
+    locationTag: "서울",
     image:
       "https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/e81e1e27-9b72-442a-b3d8-86e969c33fba.jpg",
     category: "국/탕/찌개",
+    brand: {
+      name: "집밥의완성",
+      logo: "https://example.com/brand-logo.png", // 예시 로고 URL
+    },
+    promotions: [{ text: "첫 구매라면 10,000원 즉시 할인", link: "#" }],
+    relatedCollection: {
+      text: "5월 인기 수산 모음전",
+      link: "#",
+    },
+    details: [
+      { label: "원산지", value: "상품설명/상세정보 참조" },
+      { label: "판매자", value: "컬리" },
+      { label: "포장타입", value: "냉동 (종이포장)" },
+      { label: "판매단위", value: "1팩" },
+      { label: "중량/용량", value: "옵션별 상이" },
+      { label: "알레르기 정보", value: "미역, 소고기 함유" },
+    ],
     description:
       "진한 소고기 육수와 부드러운 미역이 어우러진 건강한 미역국입니다. 간편하게 데워 드실 수 있어 바쁜 아침에도 든든하게 즐기실 수 있습니다.",
   },

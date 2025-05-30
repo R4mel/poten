@@ -67,11 +67,21 @@ export default function MainNav() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
+  {
+    Array.isArray(categories) &&
+      categories.map((cat) => (
+        <li key={cat.category_id}>
+          <Link href={`/category/${cat.category_id}`}>{cat.name}</Link>
+        </li>
+      ));
+  }
+
   useEffect(() => {
     fetch("/api/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data));
-  }, []);
+    console.log("categories", categories);
+  }, [categories]);
 
   return (
     <nav className="hidden md:flex flex-1 items-center relative">
@@ -105,17 +115,26 @@ export default function MainNav() {
 
         {/* 다른 메뉴들 */}
         <li>
-          <Link href="/new-products" className="text-gray-900 hover:text-purple-800">
+          <Link
+            href="/new-products"
+            className="text-gray-900 hover:text-purple-800"
+          >
             신상품
           </Link>
         </li>
         <li>
-          <Link href="/best-products" className="text-gray-900 hover:text-purple-800">
+          <Link
+            href="/best-products"
+            className="text-gray-900 hover:text-purple-800"
+          >
             베스트
           </Link>
         </li>
         <li>
-          <Link href="/sale-products" className="text-gray-900 hover:text-purple-800">
+          <Link
+            href="/sale-products"
+            className="text-gray-900 hover:text-purple-800"
+          >
             알뜰쇼핑
           </Link>
         </li>
