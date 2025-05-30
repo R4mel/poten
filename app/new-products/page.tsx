@@ -4,18 +4,22 @@ import TopNav from "@/components/top-nav";
 import SiteLogo from "@/components/site-logo";
 import MainNav from "@/components/main-nav";
 import SiteFooter from "@/components/site-footer";
+import { motion } from "framer-motion";
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
+
 type Product = {
-  id: number
+  product_id: number
   name: string
   imageUrl: string
   originalPrice: number
   salePrice: number
   discountRate: number
+  is_new: boolean
 }
 
 const mockCategories = [
@@ -30,79 +34,43 @@ const mockCategories = [
   { name: "간편식·밀키트·샐러드", count: 23 },
 ];
 
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: "[집밥의완성] 소고기 미역국",
-    imageUrl:  "https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/e81e1e27-9b72-442a-b3d8-86e969c33fba.jpg",
-    originalPrice: 9900,
-    salePrice: 7900,
-    discountRate: 20,
-  },
-  {
-    id: 2,
-    name: "[집밥의완성] 된장찌개",
-    imageUrl: "https://img-cf.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/shop/data/goods/1647407885598l0.jpg",
-    originalPrice: 6900,
-    salePrice: 6900,
-    discountRate: 0,
-  },
-  {
-    id: 3,
-    name: "[집밥의완성] 김치찌개",
-    imageUrl: "https://product-image.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/product/image/a695cf27-81b4-4ac2-8683-da431feedb75.jpeg",
-    originalPrice: 9900,
-    salePrice: 7900,
-    discountRate: 20,
-  },
-  {
-    id: 4,
-    name: "[집밥의완성] 제육볶음",
-    imageUrl: "https://image.greating.co.kr/IL/item/202307/10/DCCA3CA39EE84953BE0198B9D0792B43.png",
-    originalPrice: 12900,
-    salePrice: 9900,
-    discountRate: 23,
-  },
-  {
-    id: 5,
-    name: "[집밥의완성] 갈비찜",
-    imageUrl: "https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/bc5d253d-4444-4b37-af91-44c2a6014823.jpg",
-    originalPrice: 19900,
-    salePrice: 19900,
-    discountRate: 0,
-  },
-  {
-    id: 6,
-    name: "[집밥의완성] 오징어볶음",
-    imageUrl:"https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/568c9a24-18ca-40c4-b9e0-950f59a025b9.jpg",
-    originalPrice: 10900,
-    salePrice: 8900,
-    discountRate: 18,
-  },
-  {
-    id: 7,
-    name: "[집밥의완성] 시금치나물",
-    imageUrl: "https://img-cf.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/shop/data/goods/1611123823128l0.jpg",
-    originalPrice: 5900,
-    salePrice: 4900,
-    discountRate: 17,
-  },
-  {
-    id: 8,
-    name: "[집밥의완성] 잡채",
-    imageUrl: "https://img-cf.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/shop/data/goods/1642393225580l0.jpg",
-    originalPrice: 9900,
-    salePrice: 8900,
-    discountRate: 10,
-  },
-]
 
 export default function NewProductsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([])
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showVoteSection, setShowVoteSection] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [sortKey, setSortKey] = useState<string>('추천순');
+  const [quantity, setQuantity] = useState<number>(1);
+  // 브랜드 투표 선택 상태 추가
+  const [selectedBrand, setSelectedBrand] = useState<string>('');
+  // 장바구니에 담기 핸들러
+  const handleAddToCart = async () => {
+    if (!selectedProduct) return;
+  
+    try {
+      const response = await fetch(`/api/users/${userId}/cart`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: selectedProduct.product_id,
+          quantity: quantity
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error("장바구니 담기 실패");
+      }
+  
+      alert("장바구니에 담겼습니다!");
+      setSelectedProduct(null);
+      setQuantity(1);
+    } catch (error) {
+      console.error("장바구니 추가 중 오류:", error);
+      alert("장바구니 담기에 실패했습니다.");
+    }
+  };
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev =>
@@ -115,7 +83,7 @@ export default function NewProductsPage() {
   const sortProducts = (key: string, products: Product[]) => {
     switch (key) {
       case '신상품순':
-        return [...products].sort((a, b) => b.id - a.id);
+        return [...products].sort((a, b) => b.product_id - a.product_id);
       case '낮은가격순':
         return [...products].sort((a, b) => a.salePrice - b.salePrice);
       case '높은가격순':
@@ -126,9 +94,30 @@ export default function NewProductsPage() {
   };
 
   useEffect(() => {
-    const sorted = sortProducts(sortKey, mockProducts);
-    setProducts(sorted);
-  }, [sortKey]);
+    fetch("/api/products")
+      .then(res => res.json())
+      .then((data) => {
+        const productList = Array.isArray(data)
+          ? data
+          : Array.isArray((data as any).products)
+          ? (data as any).products
+          : [];
+        const filtered = productList
+          .filter((p: any) => selectedCategories.length === 0 || selectedCategories.includes(p.category))
+          .map((p: any) => ({
+            ...p,
+            imageUrl: p.imageUrl || "/images/placeholder.jpg",
+            originalPrice: p.originalPrice || p.price || 0,
+            salePrice: p.salePrice || p.price || 0,
+            discountRate: p.discountRate || 0,
+          }));
+        const sorted = sortProducts(sortKey, filtered);
+        setProducts(sorted);
+      })
+      .catch((err) => {
+        console.error("상품 불러오기 실패:", err);
+      });
+  }, [sortKey, selectedCategories]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -202,15 +191,18 @@ export default function NewProductsPage() {
               ].map((brand, index) => (
                 <label
                   key={index}
-                  className="relative group block bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition duration-200 cursor-pointer"
+                  className={`relative group block bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition duration-200 cursor-pointer ${selectedBrand === brand.name ? 'ring-4 ring-purple-300 border-purple-400' : ''}`}
+                  onClick={() => setSelectedBrand(brand.name)}
                 >
                   <input
                     type="radio"
                     name="nego-brand"
                     className="hidden peer"
                     value={brand.name}
+                    checked={selectedBrand === brand.name}
+                    onChange={() => setSelectedBrand(brand.name)}
                   />
-                  <div className="peer-checked:ring-4 peer-checked:ring-purple-300 p-4 h-full flex flex-col items-center justify-center">
+                  <div className={`p-4 h-full flex flex-col items-center justify-center ${selectedBrand === brand.name ? 'ring-4 ring-purple-300' : ''}`}>
                     <div className="relative w-24 h-24 mb-3">
                       <img
                         src={brand.image}
@@ -218,13 +210,22 @@ export default function NewProductsPage() {
                         className="object-contain w-full h-full rounded-full border border-gray-200 shadow-sm group-hover:scale-105 transition-transform"
                       />
                     </div>
-                    <p className="text-sm font-semibold text-gray-800 text-center">{brand.name}</p>
+                    <p className={`text-sm font-semibold text-center ${selectedBrand === brand.name ? 'text-purple-700' : 'text-gray-800'}`}>{brand.name}</p>
                   </div>
                 </label>
               ))}
             </div>
             <div className="text-center mt-6">
-              <button className="bg-purple-300 text-white px-6 py-2 rounded-full hover:bg-purple-400 transition font-semibold shadow">
+              <button
+                className="bg-purple-300 text-white px-6 py-2 rounded-full hover:bg-purple-400 transition font-semibold shadow"
+                onClick={() => {
+                  if (!selectedBrand) {
+                    alert("브랜드를 선택해주세요");
+                    return;
+                  }
+                  router.push('/lucky-roulette');
+                }}
+              >
                 브랜드 투표하기
               </button>
             </div>
@@ -302,41 +303,55 @@ export default function NewProductsPage() {
                 ))}
               </div>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {products.map(product => (
-                <div key={product.id} className="bg-white border rounded-lg overflow-hidden shadow-sm group">
-                  <div className="relative">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="w-full h-64 object-cover"
-                    />
-                    {product.discountRate > 0 && (
-                      <div className="absolute top-2 left-2 bg-purple-300 text-white text-xs px-2 py-1 rounded">
-                        {product.discountRate}%
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <p className="text-xs text-gray-500 mb-1">샛별배송</p>
-                    <h3 className="text-sm font-semibold line-clamp-2 leading-tight">{product.name}</h3>
-                    <p className="text-xs text-gray-500 mt-1">맛있게 즐기는 집밥 요리</p>
-                    <div className="flex items-center mt-2 space-x-2">
-                      <span className="text-lg font-bold">{product.salePrice.toLocaleString()}원</span>
+            <motion.div
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+            >
+              {products.map((product, index) => (
+                <motion.div
+                  key={product.product_id}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                >
+                  <div className="bg-white border rounded-lg overflow-hidden shadow-sm group">
+                    <div className="relative">
+                      <img
+                        src={product.imageUrl}
+                        alt={product.name}
+                        className="w-full h-64 object-cover"
+                      />
                       {product.discountRate > 0 && (
-                        <span className="line-through text-gray-400 text-sm">{product.originalPrice.toLocaleString()}원</span>
+                        <div className="absolute top-2 left-2 bg-purple-300 text-white text-xs px-2 py-1 rounded">
+                          {product.discountRate}%
+                        </div>
                       )}
                     </div>
-                    <button
-                      onClick={() => setSelectedProduct(product)}
-                      className="mt-4 w-full border border-gray-300 text-gray-700 py-1 rounded text-sm font-medium hover:bg-gray-50"
-                    >
-                      담기
-                    </button>
+                    <div className="p-4">
+                      <p className="text-xs text-gray-500 mb-1">샛별배송</p>
+                      <h3 className="text-sm font-semibold line-clamp-2 leading-tight">{product.name}</h3>
+                      <p className="text-xs text-gray-500 mt-1">맛있게 즐기는 집밥 요리</p>
+                      <div className="flex items-center mt-2 space-x-2">
+                        <span className="text-lg font-bold">{product.salePrice.toLocaleString()}원</span>
+                        {product.discountRate > 0 && (
+                          <span className="line-through text-gray-400 text-sm">{product.originalPrice.toLocaleString()}원</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => setSelectedProduct(product)}
+                        className="mt-4 w-full border border-gray-300 text-gray-700 py-1 rounded text-sm font-medium hover:bg-gray-50"
+                      >
+                        담기
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
             {selectedProduct && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg max-w-md w-full p-6">
@@ -355,21 +370,30 @@ export default function NewProductsPage() {
                       )}
                     </div>
                     <div className="flex items-center border rounded overflow-hidden">
-                      <button className="px-3 py-1">−</button>
-                      <span className="px-4">1</span>
-                      <button className="px-3 py-1">+</button>
+                      <button
+                        className="px-3 py-1"
+                        onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                      >−</button>
+                      <span className="px-4">{quantity}</span>
+                      <button
+                        className="px-3 py-1"
+                        onClick={() => setQuantity(q => q + 1)}
+                      >+</button>
                     </div>
                   </div>
                   <div className="flex justify-between items-center border-t pt-4">
-                    <span className="font-bold text-xl">{selectedProduct.salePrice.toLocaleString()} 원</span>
+                    <span className="font-bold text-xl">{(selectedProduct.salePrice * quantity).toLocaleString()} 원</span>
                     <div className="space-x-2">
                       <button
-                        onClick={() => setSelectedProduct(null)}
+                        onClick={() => { setSelectedProduct(null); setQuantity(1); }}
                         className="px-4 py-2 border rounded text-sm"
                       >
                         취소
                       </button>
-                      <button className="px-4 py-2 bg-purple-400 text-white rounded text-sm">
+                      <button
+                        className="px-4 py-2 bg-purple-400 text-white rounded text-sm"
+                        onClick={handleAddToCart}
+                      >
                         장바구니 담기
                       </button>
                     </div>

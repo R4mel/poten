@@ -68,18 +68,18 @@ export default function Home() {
 
       <main className="flex-1 container mx-auto px-4 py-8 space-y-12">
         {/* Full-width promotional banner */}
-        <div className="relative w-full">
+        <div className="relative w-full overflow-hidden rounded-xl">
           <img
             src={bannerImages[currentBanner]}
             alt="Main Promotion Banner"
-            className="w-full h-[370px] object-cover"
+            className="w-full h-[370px] object-cover rounded-xl shadow-lg ring-2 ring-purple-300 transition duration-500"
           />
         </div>
 
         {/* Special Event Section */}
         <section>
           <h2 className="text-3xl font-bold mb-4 text-center">
-            👑 10주년 핵심 특가 라인업 👑
+            👑  핵심 특가 라인업 👑
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
             {[
@@ -120,10 +120,10 @@ export default function Home() {
                 badge: "10th 수산간편식",
               },
             ].map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow overflow-hidden">
+              <div key={item.id} className="bg-white rounded-xl shadow hover:shadow-xl hover:scale-105 transition-all duration-300 overflow-hidden">
                 <div className="relative">
-                  <img src={item.img} alt={item.title} className="w-full" />
-                  <span className="absolute top-2 left-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                  <img src={item.img} alt={item.title} className="w-full rounded-t-lg transition-all" />
+                  <span className="absolute top-2 left-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
                     {item.badge}
                   </span>
                 </div>
@@ -134,7 +134,7 @@ export default function Home() {
                     <span className="line-through text-gray-400">{item.original}</span>
                   </div>
                   <span className="text-red-500 font-semibold">{item.discount}</span>
-                  <button className="mt-2 w-full border border-gray-300 text-gray-700 bg-white py-1 rounded text-sm font-medium hover:bg-gray-50">
+                  <button className="mt-2 w-full border border-gray-300 text-gray-700 bg-white py-1 rounded text-sm font-medium hover:bg-purple-50 hover:text-purple-700 transition">
                     담기
                   </button>
                 </div>

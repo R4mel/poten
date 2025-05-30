@@ -30,72 +30,6 @@ const mockCategories = [
   { name: "간편식·밀키트·샐러드", count: 23 },
 ];
 
-const mockProducts: Product[] = [
-  {
-    id: 1,
-    name: "[집밥의완성] 소고기 미역국",
-    imageUrl:  "https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/e81e1e27-9b72-442a-b3d8-86e969c33fba.jpg",
-    originalPrice: 9900,
-    salePrice: 7900,
-    discountRate: 20,
-  },
-  {
-    id: 2,
-    name: "[집밥의완성] 된장찌개",
-    imageUrl: "https://img-cf.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/shop/data/goods/1647407885598l0.jpg",
-    originalPrice: 6900,
-    salePrice: 6900,
-    discountRate: 0,
-  },
-  {
-    id: 3,
-    name: "[집밥의완성] 김치찌개",
-    imageUrl: "https://product-image.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/product/image/a695cf27-81b4-4ac2-8683-da431feedb75.jpeg",
-    originalPrice: 9900,
-    salePrice: 7900,
-    discountRate: 20,
-  },
-  {
-    id: 4,
-    name: "[집밥의완성] 제육볶음",
-    imageUrl: "https://image.greating.co.kr/IL/item/202307/10/DCCA3CA39EE84953BE0198B9D0792B43.png",
-    originalPrice: 12900,
-    salePrice: 9900,
-    discountRate: 23,
-  },
-  {
-    id: 5,
-    name: "[집밥의완성] 갈비찜",
-    imageUrl: "https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/bc5d253d-4444-4b37-af91-44c2a6014823.jpg",
-    originalPrice: 19900,
-    salePrice: 19900,
-    discountRate: 0,
-  },
-  {
-    id: 6,
-    name: "[집밥의완성] 오징어볶음",
-    imageUrl:"https://product-image.kurly.com/hdims/resize/%5E%3E720x%3E936/cropcenter/720x936/quality/85/src/product/image/568c9a24-18ca-40c4-b9e0-950f59a025b9.jpg",
-    originalPrice: 10900,
-    salePrice: 8900,
-    discountRate: 18,
-  },
-  {
-    id: 7,
-    name: "[집밥의완성] 시금치나물",
-    imageUrl: "https://img-cf.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/shop/data/goods/1611123823128l0.jpg",
-    originalPrice: 5900,
-    salePrice: 4900,
-    discountRate: 17,
-  },
-  {
-    id: 8,
-    name: "[집밥의완성] 잡채",
-    imageUrl: "https://img-cf.kurly.com/hdims/resize/%5E%3E360x%3E468/cropcenter/360x468/quality/85/src/shop/data/goods/1642393225580l0.jpg",
-    originalPrice: 9900,
-    salePrice: 8900,
-    discountRate: 10,
-  },
-]
 
 export default function NewProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -126,8 +60,23 @@ export default function NewProductsPage() {
   };
 
   useEffect(() => {
-    const sorted = sortProducts(sortKey, mockProducts);
-    setProducts(sorted);
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        const productList = Array.isArray(data) ? data : Array.isArray(data.products) ? data.products : [];
+        const filtered = productList.map((p: any) => ({
+          ...p,
+          imageUrl: p.imageUrl || "/images/placeholder.jpg",
+          originalPrice: p.originalPrice || p.price || 0,
+          salePrice: p.salePrice || p.price || 0,
+          discountRate: p.discountRate || 0,
+        }));
+        const sorted = sortProducts(sortKey, filtered);
+        setProducts(sorted);
+      })
+      .catch((err) => {
+        console.error("상품 불러오기 실패:", err);
+      });
   }, [sortKey]);
 
   return (
