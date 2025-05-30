@@ -8,21 +8,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ message: '잘못된 사용자 ID' });
   }
 
-  // 사용자 장바구니 조회
   if (req.method === 'GET') {
-    const { data: cart, error } = await supabase
+    // cart_id 조회
+    const { data: cart, error: cartError } = await supabase
       .from('Carts')
-      .select('*, Cart_Items(*, Product:product_id(*))')
+      .select('cart_id')
       .eq('user_id', Number(userId))
       .single();
 
-    if (error) {
-      return res.status(500).json({ message: '장바구니 조회 중 오류 발생', error: error.message });
+    if (cartError || !cart) {
+      return res.status(404).json({ message: '장바구니가 없습니다.' });
     }
 
-    return res.status(200).json(cart);
-  }
+    // cart_item 목록 조회 (상품 정보 포함)
+    const { data: cartItems, error } = await supabase
+      .from('Cart_Items')
+      .select('product_id, quantity, Product:product_id(name, price)')
+      .eq('cart_id', cart.cart_id);
 
+    if (error) {
+      return res.status(500).json({ message: '장바구니 상품 조회 중 오류 발생', error: error.message });
+    }
+
+    return res.status(200).json({
+      cart_id: cart.cart_id,
+      user_id: Number(userId),
+      items: cartItems,
+    });
+  }
   // 장바구니에 상품 추가
   if (req.method === 'POST') {
     const { product_id, quantity } = req.body;
@@ -81,34 +94,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
-    // 3) 상품 수량 변경
-  if (req.method === 'PATCH') {
-    const { cart_item_id, quantity } = req.body;
-
-    // 유효성 검사: cart_item_id 필수, quantity는 1 이상 정수
-    if (
-        !cart_item_id ||
-        typeof quantity !== 'number' ||
-        !Number.isInteger(quantity) ||
-        quantity < 1
-    ) {
-        return res.status(400).json({ message: 'cart_item_id와 1 이상의 정수 quantity가 필요합니다.' });
-    }
-
-    const { data: updatedItem, error } = await supabase
-        .from('Cart_Items')
-        .update({ quantity })
-        .eq('cart_item_id', cart_item_id)
-        .select()
-        .single();
-
-    if (error) {
-        return res.status(500).json({ message: '수량 변경 중 오류 발생', error: error.message });
-    }
-
-    return res.status(200).json(updatedItem);
-  }
-
-  res.setHeader('Allow', ['GET', 'POST', 'PATCH']);
+  res.setHeader('Allow', ['GET', 'POST']);
   res.status(405).end(`Method ${req.method} Not Allowed`);
 }
