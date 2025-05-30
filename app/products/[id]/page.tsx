@@ -1,34 +1,44 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Menu, Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { products } from "@/lib/products";
 import { useCart } from "@/lib/use-cart";
 import SiteFooter from "@/components/site-footer";
 import TopNav from "@/components/top-nav";
 import MainNav from "@/components/main-nav";
 import SiteLogo from "@/components/site-logo";
 
-export default function ProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function ProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { toast } = useToast();
   const { addToCart, items } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Unwrap params using React.use()
-  const { id } = React.use(params);
-  const product = products.find((p) => p.id === id);
+  // Unwrap params using React.use() for Next.js compatibility
+  const { id } = React.use(params as any) as { id: string };
 
+  useEffect(() => {
+    async function fetchProduct() {
+      setLoading(true);
+      const res = await fetch(`/api/products/${id}`);
+      const data = await res.json();
+      if (res.ok) setProduct(data);
+      setLoading(false);
+    }
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div className="container mx-auto px-4 py-8">로딩 중...</div>;
+  }
   if (!product) {
     return <div className="container mx-auto px-4 py-8">Product not found</div>;
   }
@@ -44,8 +54,9 @@ export default function ProductPage({
   };
 
   const handleAddToCart = () => {
+    const cartProductId = product.product_id || product.id;
     addToCart({
-      id: product.id,
+      id: String(cartProductId),
       name: product.name,
       price: product.price,
       image: product.imageUrl || "",

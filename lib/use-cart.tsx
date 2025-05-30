@@ -51,11 +51,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                 );
                 const product = await productRes.json();
                 return {
-                  id: String(ci.product_id),
+                  id: String(product.id || product.product_id),
                   name: product.name || "",
                   price: product.price || 0,
                   quantity: ci.quantity,
-                  image: (product.images && product.images[0]?.url) || "",
+                  image:
+                    product.imageUrl ||
+                    (product.images && product.images[0]?.url) ||
+                    "",
                 };
               }
             })
