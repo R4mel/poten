@@ -223,11 +223,17 @@ export default function SignupForm() {
     <>
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 max-w-md mx-auto p-6 bg-white rounded shadow"
+        className="space-y-4 max-w-md w-full mx-auto p-4 md:p-6 bg-white rounded shadow
+          sm:max-w-lg
+          md:max-w-xl
+          lg:max-w-2xl
+          xl:max-w-3xl
+          2xl:max-w-4xl
+        "
       >
         {/* Email */}
-        <div className="flex items-center gap-2">
-          <Label className="w-28 text-right" htmlFor="email">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Label className="w-full sm:w-28 text-right sm:text-right" htmlFor="email">
             이메일
           </Label>
           <Input
@@ -238,14 +244,14 @@ export default function SignupForm() {
             value={form.email}
             onChange={handleChange}
             required
-            className="flex-1"
+            className="flex-1 min-w-0"
             disabled={emailVerified}
           />
           <Button
             type="button"
             onClick={handleSendVerification}
             disabled={loading || emailVerified}
-            className="ml-2"
+            className="ml-0 sm:ml-2"
           >
             {verificationSent ? "재전송" : "인증코드 전송"}
           </Button>
@@ -271,8 +277,8 @@ export default function SignupForm() {
           <div className="text-red-500 text-xs ml-28">{errors.email}</div>
         )}
         {/* Password */}
-        <div className="flex items-center gap-2">
-          <Label className="w-28 text-right" htmlFor="password">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Label className="w-full sm:w-28 text-right" htmlFor="password">
             비밀번호
           </Label>
           <Input
@@ -283,12 +289,12 @@ export default function SignupForm() {
             value={form.password}
             onChange={handleChange}
             required
-            className="flex-1"
+            className="flex-1 min-w-0"
           />
         </div>
         {/* Confirm Password */}
-        <div className="flex items-center gap-2">
-          <Label className="w-28 text-right" htmlFor="confirmPassword">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Label className="w-full sm:w-28 text-right" htmlFor="confirmPassword">
             비밀번호확인
           </Label>
           <Input
@@ -299,7 +305,7 @@ export default function SignupForm() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="flex-1"
+            className="flex-1 min-w-0"
           />
         </div>
         {errors.confirmPassword && (
@@ -308,8 +314,8 @@ export default function SignupForm() {
           </div>
         )}
         {/* Name */}
-        <div className="flex items-center gap-2">
-          <Label className="w-28 text-right" htmlFor="name">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Label className="w-full sm:w-28 text-right" htmlFor="name">
             이름
           </Label>
           <Input
@@ -339,15 +345,15 @@ export default function SignupForm() {
               setForm((f) => ({ ...f, name: filtered }));
             }}
             required
-            className="flex-1"
+            className="flex-1 min-w-0"
           />
         </div>
         {errors.name && (
           <div className="text-red-500 text-xs ml-28">{errors.name}</div>
         )}
         {/* Phone */}
-        <div className="flex items-center gap-2">
-          <Label className="w-28 text-right" htmlFor="phone">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Label className="w-full sm:w-28 text-right" htmlFor="phone">
             휴대폰
           </Label>
           <Input
@@ -362,15 +368,15 @@ export default function SignupForm() {
               }
             }}
             required
-            className="flex-1"
+            className="flex-1 min-w-0"
           />
         </div>
         {errors.phone && (
           <div className="text-red-500 text-xs ml-28">{errors.phone}</div>
         )}
         {/* Address */}
-        <div className="flex items-center gap-2">
-          <Label className="w-28 text-right" htmlFor="address">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Label className="w-full sm:w-28 text-right" htmlFor="address">
             주소
           </Label>
           <Input
@@ -380,13 +386,13 @@ export default function SignupForm() {
             value={form.address}
             onChange={handleChange}
             required
-            className="flex-1"
+            className="flex-1 min-w-0"
             readOnly
           />
           <Button
             type="button"
             onClick={handleAddressSearch}
-            className="ml-2 whitespace-nowrap"
+            className="ml-0 sm:ml-2 whitespace-nowrap"
           >
             주소 검색
           </Button>
