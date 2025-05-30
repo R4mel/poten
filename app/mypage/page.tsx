@@ -369,8 +369,8 @@ export default function MyPage() {
           {/* 주문내역 */}
           {section === "orders" && (
             <section className="bg-white rounded-2xl shadow p-8 mb-8">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="text-2xl">📦</span> 주문 내역
+              <h2 className="text-base sm:text-xl font-bold mb-6 flex items-center gap-2 whitespace-nowrap">
+                <span className="text-2xl">📦</span> 주문내역
               </h2>
               {loadingOrders ? (
                 <div className="py-8 text-center text-gray-500">로딩 중...</div>
@@ -431,7 +431,7 @@ export default function MyPage() {
           {/* 회원정보 */}
           {section === "profile" && (
             <section className="bg-white rounded-2xl shadow p-8 mb-8">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <h2 className="text-base sm:text-xl font-bold mb-6 flex items-center gap-2 whitespace-nowrap">
                 <span className="text-2xl">👤</span> 회원정보
               </h2>
               <form
@@ -495,7 +495,7 @@ export default function MyPage() {
           {/* 비밀번호 변경 */}
           {section === "password" && (
             <section className="bg-white rounded-2xl shadow p-8 mb-8 max-w-lg">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <h2 className="text-base sm:text-xl font-bold mb-6 flex items-center gap-2 whitespace-nowrap">
                 <span className="text-2xl">🔒</span> 비밀번호 변경
               </h2>
               <form onSubmit={handleUpdate} className="flex flex-col gap-6">
