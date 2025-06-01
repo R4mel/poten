@@ -22,6 +22,8 @@ export default function Home() {
     id: number;
     name: string;
   } | null>(null);
+  // 삼선버튼(카테고리 드로어) 상태 추가
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/products")
@@ -112,7 +114,12 @@ export default function Home() {
               </Link>
             </div>
 
-            <button className="ml-4 md:hidden">
+            {/* 홈페이지에서만 삼선버튼 보이도록 */}
+            <button
+              className="ml-4 md:hidden"
+              aria-label="카테고리 열기"
+              onClick={() => setCategoryDrawerOpen(true)}
+            >
               <Menu className="h-6 w-6" />
             </button>
           </div>
@@ -183,6 +190,35 @@ export default function Home() {
       </main>
 
       <SiteFooter />
+
+      {/* 모바일 카테고리 드로어 */}
+      {categoryDrawerOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/40 flex justify-end md:hidden"
+          onClick={() => setCategoryDrawerOpen(false)}
+        >
+          <div
+            className="bg-white w-64 h-full shadow-lg p-6 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+              onClick={() => setCategoryDrawerOpen(false)}
+              aria-label="닫기"
+            >
+              ×
+            </button>
+            <h2 className="text-lg font-bold mb-4">카테고리</h2>
+            <CategoryDropdown
+              alwaysOpen
+              onCategorySelect={(id, name) => {
+                handleCategorySelect(id, name);
+                setCategoryDrawerOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
