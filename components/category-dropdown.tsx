@@ -3,8 +3,10 @@ import { useEffect, useState, useRef } from "react";
 
 export default function CategoryDropdown({
   onCategorySelect,
+  alwaysOpen = false,
 }: {
   onCategorySelect?: (categoryId: number, categoryName: string) => void;
+  alwaysOpen?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
@@ -23,7 +25,7 @@ export default function CategoryDropdown({
 
   // Close dropdown on outside click
   useEffect(() => {
-    if (!open) return;
+    if (!open || alwaysOpen) return;
     function handleClick(e: MouseEvent) {
       if (
         dropdownRef.current &&
@@ -34,30 +36,49 @@ export default function CategoryDropdown({
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [open]);
+  }, [open, alwaysOpen]);
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        className="flex items-center text-gray-900 hover:text-purple-800 focus:outline-none"
-        onClick={() => setOpen((v) => !v)}
-        type="button"
-        aria-expanded={open}
-        aria-haspopup="listbox"
-      >
-        <span className="mr-1">카테고리</span>
-        <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
-          <path
-            d="M6 9l6 6 6-6"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
-      {open && (
-        <div className="absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+    <div className={alwaysOpen ? undefined : "relative"} ref={dropdownRef}>
+      {!alwaysOpen && (
+        <button
+          className="flex items-center text-gray-900 hover:text-purple-800 focus:outline-none"
+          onClick={() => setOpen((v) => !v)}
+          type="button"
+          aria-expanded={open}
+          aria-haspopup="listbox"
+        >
+          <span className="mr-1">카테고리</span>
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+      )}
+      {(alwaysOpen || open) && (
+        <div
+          className={
+            alwaysOpen
+              ? "w-full"
+              : "absolute left-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+          }
+          style={
+            alwaysOpen
+              ? {
+                  background: "white",
+                  borderRadius: "0.5rem",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  border: "1px solid #e5e7eb",
+                  padding: "0.5rem 0",
+                }
+              : undefined
+          }
+        >
           {loading ? (
             <div className="p-4 text-gray-500 text-center">로딩 중...</div>
           ) : (

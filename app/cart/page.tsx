@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/use-cart";
 import SiteFooter from "@/components/site-footer";
@@ -10,8 +10,9 @@ import TopNav from "@/components/top-nav";
 import MainNav from "@/components/main-nav";
 import SiteLogo from "@/components/site-logo";
 import { loadTossPaymentsWidget } from "@/lib/toss-widget";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import CategoryDropdown from "@/components/category-dropdown";
 
 declare global {
   interface Window {
@@ -22,6 +23,7 @@ declare global {
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, clearCart } = useCart();
   const { data: session } = useSession();
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
 
   const totalPrice = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -95,7 +97,6 @@ export default function CartPage() {
             <nav className="hidden md:flex flex-1 items-center">
               <MainNav />
             </nav>
-
             <div className="flex items-center ml-auto space-x-4">
               <Link href="/cart" className="relative text-gray-700">
                 <ShoppingCart className="h-6 w-6" />
@@ -103,9 +104,45 @@ export default function CartPage() {
                   {items.length}
                 </span>
               </Link>
+              {/* 홈페이지에서만 삼선버튼 보이도록 분기 */}
+              {typeof window !== "undefined" &&
+                window.location.pathname === "/" && (
+                  <button
+                    className="ml-4 md:hidden"
+                    aria-label="카테고리 열기"
+                    onClick={() => setCategoryDrawerOpen(true)}
+                  >
+                    <Menu className="h-6 w-6" />
+                  </button>
+                )}
             </div>
           </div>
         </div>
+        {/* 모바일 카테고리 드로어 */}
+        {categoryDrawerOpen && (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 flex justify-end md:hidden"
+            onClick={() => setCategoryDrawerOpen(false)}
+          >
+            <div
+              className="bg-white w-64 h-full shadow-lg p-6 relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+                onClick={() => setCategoryDrawerOpen(false)}
+                aria-label="닫기"
+              >
+                ×
+              </button>
+              <h2 className="text-lg font-bold mb-4">카테고리</h2>
+              <CategoryDropdown
+                alwaysOpen
+                onCategorySelect={() => setCategoryDrawerOpen(false)}
+              />
+            </div>
+          </div>
+        )}
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-8">
