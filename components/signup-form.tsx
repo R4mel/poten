@@ -318,13 +318,8 @@ export default function SignupForm() {
             placeholder="이름을 입력해주세요"
             value={nameInput}
             onChange={(e) => {
-              // Allow only Korean and English letters, but do not filter during composition
               const value = e.target.value;
-              if (isComposing) {
-                setNameInput(value);
-              } else {
-                setNameInput(value.replace(/[^a-zA-Z가-힣]/g, ""));
-              }
+              setNameInput(value); // Always set raw value
             }}
             onCompositionStart={() => setIsComposing(true)}
             onCompositionEnd={(e) => {
@@ -340,6 +335,7 @@ export default function SignupForm() {
             onBlur={(e) => {
               // On blur, update form state with filtered value
               const filtered = e.target.value.replace(/[^a-zA-Z가-힣]/g, "");
+              setNameInput(filtered);
               setForm((f) => ({ ...f, name: filtered }));
             }}
             required
