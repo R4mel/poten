@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -27,11 +27,14 @@ export default function LoginPage() {
   const router = useRouter();
 
   // If already logged in, redirect to home
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace("/");
+    }
+  }, [status, router]);
+
   if (status === "loading") return null;
-  if (session) {
-    if (typeof window !== "undefined") router.replace("/");
-    return null;
-  }
+  if (session) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });

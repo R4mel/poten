@@ -309,6 +309,14 @@ export default function MyPage() {
       });
   }, [user?.user_id]);
 
+  // Sidebar navigation items
+  const navItems = [
+    { key: "orders", label: "주문내역", icon: "📦" },
+    { key: "profile", label: "회원정보", icon: "👤" },
+    { key: "password", label: "비밀번호 변경", icon: "🔒" },
+  ];
+  const [section, setSection] = useState("orders");
+
   if (status === "loading") {
     return <div className="py-16 text-center">Loading...</div>;
   }
@@ -317,14 +325,6 @@ export default function MyPage() {
     router.replace("/login");
     return null;
   }
-
-  // Sidebar navigation items
-  const navItems = [
-    { key: "orders", label: "주문내역", icon: "📦" },
-    { key: "profile", label: "회원정보", icon: "👤" },
-    { key: "password", label: "비밀번호 변경", icon: "🔒" },
-  ];
-  const [section, setSection] = useState("orders");
 
   return (
     <div className="min-h-screen bg-[#f9fafb] flex flex-col items-center py-6 sm:py-10">
@@ -534,10 +534,9 @@ export default function MyPage() {
           {isAdmin && (
             <section className="bg-white rounded-2xl shadow p-8 mb-8">
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="text-2xl">🛒</span> [관리자] 상품 관리 (CRUD)
+                <span className="text-2xl">🛒</span> [관리자] 상품 관리
               </h2>
               <div className="mb-4 p-4 border rounded bg-gray-100">
-                <div className="font-bold mb-2">[관리자] 상품 관리 (CRUD)</div>
                 <div className="mb-2 flex justify-between items-center">
                   <span>총 {products.length}개</span>
                   <Dialog open={showAdd} onOpenChange={setShowAdd}>
