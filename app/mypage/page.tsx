@@ -327,10 +327,10 @@ export default function MyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f9fafb] flex flex-col items-center py-10">
-      <div className="w-full max-w-5xl flex gap-8">
+    <div className="min-h-screen bg-[#f9fafb] flex flex-col items-center py-6 sm:py-10">
+      <div className="w-full max-w-5xl flex flex-col lg:flex-row gap-8 px-2 sm:px-4">
         {/* Sidebar */}
-        <aside className="w-56 shrink-0">
+        <aside className="w-full lg:w-56 shrink-0 mb-6 lg:mb-0">
           <div className="bg-white rounded-2xl shadow p-6 mb-6">
             <div className="flex flex-col items-center">
               <Avatar className="h-20 w-20 mb-2 border-4 border-purple-100 shadow">
@@ -349,7 +349,7 @@ export default function MyPage() {
               </span>
             </div>
           </div>
-          <nav className="bg-white rounded-2xl shadow p-4 flex flex-col gap-2">
+          <nav className="bg-white rounded-2xl shadow p-4 flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible">
             {navItems.map((item) => (
               <button
                 key={item.key}
@@ -369,8 +369,8 @@ export default function MyPage() {
           {/* 주문내역 */}
           {section === "orders" && (
             <section className="bg-white rounded-2xl shadow p-8 mb-8">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <span className="text-2xl">📦</span> 주문 내역
+              <h2 className="text-base sm:text-xl font-bold mb-6 flex items-center gap-2 whitespace-nowrap">
+                <span className="text-2xl">📦</span> 주문내역
               </h2>
               {loadingOrders ? (
                 <div className="py-8 text-center text-gray-500">로딩 중...</div>
@@ -431,7 +431,7 @@ export default function MyPage() {
           {/* 회원정보 */}
           {section === "profile" && (
             <section className="bg-white rounded-2xl shadow p-8 mb-8">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <h2 className="text-base sm:text-xl font-bold mb-6 flex items-center gap-2 whitespace-nowrap">
                 <span className="text-2xl">👤</span> 회원정보
               </h2>
               <form
@@ -495,7 +495,7 @@ export default function MyPage() {
           {/* 비밀번호 변경 */}
           {section === "password" && (
             <section className="bg-white rounded-2xl shadow p-8 mb-8 max-w-lg">
-              <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <h2 className="text-base sm:text-xl font-bold mb-6 flex items-center gap-2 whitespace-nowrap">
                 <span className="text-2xl">🔒</span> 비밀번호 변경
               </h2>
               <form onSubmit={handleUpdate} className="flex flex-col gap-6">
